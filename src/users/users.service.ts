@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersEntity } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import { CreateUserRequestDto } from './dto/create-member-request.dto';
+import { FindUserRequestDto } from './dto/find-user-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,16 @@ export class UsersService {
     });
 
     return this.usersRepository.save(createdUser);
+  }
+
+  async findUserByEmailAndPassword(user: FindUserRequestDto) {
+    return this.usersRepository.findOne({
+      where: {
+        email: user.email,
+        password: user.password,
+        phoneNumber: user.phoneNumber,
+      },
+    });
   }
 
   private async verifyExistUserInfo(user: CreateUserRequestDto) {

@@ -1,6 +1,8 @@
 import { Column, Entity } from 'typeorm';
 import { BaseModel } from '../../common/entities/base-model';
+import { Exclude, Expose } from 'class-transformer';
 
+@Exclude({ toPlainOnly: true })
 @Entity('users', { schema: 'foori' })
 export class UsersEntity extends BaseModel {
   @Column({
@@ -8,6 +10,7 @@ export class UsersEntity extends BaseModel {
     type: 'varchar',
     length: 40,
   })
+  @Expose()
   name: string;
   @Column({
     name: 'login_id',
@@ -35,6 +38,7 @@ export class UsersEntity extends BaseModel {
     length: 100,
     unique: true,
   })
+  @Expose()
   email: string;
   @Column({
     name: 'phone_number',
