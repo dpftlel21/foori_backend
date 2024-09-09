@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { UesrsModule } from './uesrs/uesrs.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
       charset: 'utf8mb4_unicode_ci', // 한글 인코딩
       timezone: '+09:00', // 한국 시간
     }),
+    UesrsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
