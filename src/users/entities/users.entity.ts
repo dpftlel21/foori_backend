@@ -2,7 +2,7 @@ import { Column, Entity } from 'typeorm';
 import { BaseModel } from '../../common/entities/base-model';
 
 @Entity('users', { schema: 'foori' })
-export class Users extends BaseModel {
+export class UsersEntity extends BaseModel {
   @Column({
     name: 'user_name',
     type: 'varchar',
@@ -20,7 +20,7 @@ export class Users extends BaseModel {
   @Column({
     name: 'password',
     type: 'varchar',
-    length: 100,
+    length: 150,
   })
   password: string;
   @Column({

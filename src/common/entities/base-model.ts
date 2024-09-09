@@ -5,23 +5,21 @@ import {
 } from 'typeorm';
 
 export abstract class BaseModel {
-  @PrimaryGeneratedColumn('identity', {
+  @PrimaryGeneratedColumn({
     type: 'int',
-    name: 'user_id',
+    name: 'id',
     comment: '고유번호(PK)',
   })
   id: number;
   @CreateDateColumn({
-    type: 'date',
+    type: 'datetime',
     name: 'created_at',
-    nullable: false,
     comment: '생성일자',
   })
   createdAt: Date;
   @UpdateDateColumn({
-    type: 'date',
+    type: 'datetime',
     name: 'updated_at',
-    nullable: false,
     comment: '수정일자',
   })
   updatedAt: Date;
