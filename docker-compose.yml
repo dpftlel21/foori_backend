@@ -1,0 +1,13 @@
+services:
+  mariadb:
+    image: mariadb:11.5.2
+    restart: always
+    volumes:
+      - ./mariadb-data:/var/lib/mysql
+    ports:
+      - 3308:3308
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${FOORI_MYSQL_DATABASE}
+      MYSQL_USER: ${FOORI_MYSQL_USER}
+      MYSQL_PASSWORD: ${FOORI_MYSQL_PASSWORD}
