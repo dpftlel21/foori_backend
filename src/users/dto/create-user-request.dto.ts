@@ -15,12 +15,6 @@ export class CreateUserRequestDto {
   name: string;
 
   @IsString({ message: stringValidationMessage })
-  @Length(6, 20, {
-    message: lengthValidationMessage,
-  })
-  loginId: string;
-
-  @IsString({ message: stringValidationMessage })
   @Length(8, 25, {
     message: lengthValidationMessage,
   })
