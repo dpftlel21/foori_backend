@@ -67,10 +67,28 @@ export class UsersService {
   }
 
   /**
+   * 이메일로 회원을 찾는 함수
+   * @param email
+   */
+  async findUserByEmail(email: string) {
+    try {
+      const findUser = await this.usersRepository.findOneOrFail({
+        where: {
+          email,
+        },
+      });
+
+      return findUser;
+    } catch (error) {
+      throw new BadRequestException('일치하는 정보가 없습니다.');
+    }
+  }
+
+  /**
    * 회원 가입 시 중복된 정보를 확인하는 함수
    * @param user
    */
-  private async verifyNonExistUserInfo(user: RegisterUserRequestDto) {
+  async verifyNonExistUserInfo(user: RegisterUserRequestDto) {
     const [emailExists, phoneNumberExists] = await Promise.all([
       this.usersRepository.exists({ where: { email: user.email } }),
       this.usersRepository.exists({ where: { phoneNumber: user.phoneNumber } }),
