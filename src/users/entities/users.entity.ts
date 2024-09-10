@@ -12,26 +12,21 @@ export class UsersEntity extends BaseModel {
   })
   @Expose()
   name: string;
-  @Column({
-    name: 'login_id',
-    type: 'varchar',
-    length: 40,
-    unique: true,
-    update: false,
-  })
-  loginId: string;
+
   @Column({
     name: 'password',
     type: 'varchar',
     length: 150,
   })
   password: string;
+
   @Column({
     name: 'date_of_birth',
     type: 'date',
     update: false,
   })
   birth: Date;
+
   @Column({
     name: 'email',
     type: 'varchar',
@@ -40,6 +35,7 @@ export class UsersEntity extends BaseModel {
   })
   @Expose()
   email: string;
+
   @Column({
     name: 'phone_number',
     type: 'varchar',
