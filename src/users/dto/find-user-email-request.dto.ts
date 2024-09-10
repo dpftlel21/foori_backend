@@ -1,4 +1,4 @@
-import { CreateUserRequestDto } from './create-member-request.dto';
+import { CreateUserRequestDto } from './create-user-request.dto';
 import { PickType } from '@nestjs/mapped-types';
 import { IsString, Length } from 'class-validator';
 import { stringValidationMessage } from '../../common/validation-message/string-validation.message';
