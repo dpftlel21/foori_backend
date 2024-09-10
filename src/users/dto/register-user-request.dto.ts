@@ -7,7 +7,7 @@ import { PhoneNumber } from '../../common/validator/phone-number-validator';
 import { DateAfter } from '../../common/validator/date-after-validator';
 import { Type } from 'class-transformer';
 
-export class CreateUserRequestDto {
+export class RegisterUserRequestDto {
   @IsString({ message: stringValidationMessage })
   @Length(2, 20, {
     message: lengthValidationMessage,

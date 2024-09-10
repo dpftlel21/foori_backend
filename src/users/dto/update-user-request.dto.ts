@@ -1,12 +1,12 @@
 import { PartialType, PickType } from '@nestjs/mapped-types';
-import { CreateUserRequestDto } from './create-user-request.dto';
+import { RegisterUserRequestDto } from './register-user-request.dto';
 import { IsString, Length } from 'class-validator';
 import { stringValidationMessage } from '../../common/validation-message/string-validation.message';
 import { lengthValidationMessage } from '../../common/validation-message/length-validation.message';
 import { PhoneNumber } from '../../common/validator/phone-number-validator';
 
 export class UpdateUserRequestDto extends PartialType(
-  PickType(CreateUserRequestDto, ['name', 'phoneNumber'] as const),
+  PickType(RegisterUserRequestDto, ['name', 'phoneNumber'] as const),
 ) {
   @IsString({ message: stringValidationMessage })
   @Length(2, 20, {
