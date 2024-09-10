@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { FindUserPasswordRequestDto } from './dto/find-user-password-request.dto';
 import { FindUserEmailRequestDto } from './dto/find-user-email-request.dto';
-import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -34,7 +33,7 @@ export class UsersService {
    */
   async findUserEmail(user: FindUserEmailRequestDto) {
     try {
-      const findUser = await this.usersRepository.findOne({
+      const findUser = await this.usersRepository.findOneOrFail({
         where: {
           name: user.name,
           phoneNumber: user.phoneNumber,
@@ -66,8 +65,6 @@ export class UsersService {
       throw new BadRequestException('일치하는 정보가 없습니다.');
     }
   }
-
-  async updateUser(user: UpdateUserRequestDto) {}
 
   /**
    * 회원 가입 시 중복된 정보를 확인하는 함수
