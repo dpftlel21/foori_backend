@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserRequestDto } from './dto/create-user-request.dto';
+import { RegisterUserRequestDto } from './dto/register-user-request.dto';
 import { FindUserEmailRequestDto } from './dto/find-user-email-request.dto';
 import { FindUserPasswordRequestDto } from './dto/find-user-password-request.dto';
 import { UpdateUserRequestDto } from './dto/update-user-request.dto';
@@ -10,7 +10,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  async createUser(@Body() user: CreateUserRequestDto) {
+  async createUser(@Body() user: RegisterUserRequestDto) {
     return this.usersService.createUser(user);
   }
 

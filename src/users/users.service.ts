@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersEntity } from './entities/users.entity';
 import { Repository } from 'typeorm';
-import { CreateUserRequestDto } from './dto/create-user-request.dto';
+import { RegisterUserRequestDto } from './dto/register-user-request.dto';
 import { FindUserPasswordRequestDto } from './dto/find-user-password-request.dto';
 import { FindUserEmailRequestDto } from './dto/find-user-email-request.dto';
 
@@ -17,7 +17,7 @@ export class UsersService {
    * 회원 가입 함수
    * @param user
    */
-  async createUser(user: CreateUserRequestDto) {
+  async createUser(user: RegisterUserRequestDto) {
     await this.verifyNonExistUserInfo(user);
 
     const createdUser = this.usersRepository.create({
@@ -67,10 +67,28 @@ export class UsersService {
   }
 
   /**
+   * 이메일로 회원을 찾는 함수
+   * @param email
+   */
+  async findUserByEmail(email: string) {
+    try {
+      const findUser = await this.usersRepository.findOneOrFail({
+        where: {
+          email,
+        },
+      });
+
+      return findUser;
+    } catch (error) {
+      throw new BadRequestException('일치하는 정보가 없습니다.');
+    }
+  }
+
+  /**
    * 회원 가입 시 중복된 정보를 확인하는 함수
    * @param user
    */
-  private async verifyNonExistUserInfo(user: CreateUserRequestDto) {
+  async verifyNonExistUserInfo(user: RegisterUserRequestDto) {
     const [emailExists, phoneNumberExists] = await Promise.all([
       this.usersRepository.exists({ where: { email: user.email } }),
       this.usersRepository.exists({ where: { phoneNumber: user.phoneNumber } }),

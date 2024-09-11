@@ -1,11 +1,11 @@
-import { CreateUserRequestDto } from './create-user-request.dto';
+import { RegisterUserRequestDto } from './register-user-request.dto';
 import { PickType } from '@nestjs/mapped-types';
 import { IsString, Length } from 'class-validator';
 import { stringValidationMessage } from '../../common/validation-message/string-validation.message';
 import { lengthValidationMessage } from '../../common/validation-message/length-validation.message';
 import { PhoneNumber } from '../../common/validator/phone-number-validator';
 
-export class FindUserEmailRequestDto extends PickType(CreateUserRequestDto, [
+export class FindUserEmailRequestDto extends PickType(RegisterUserRequestDto, [
   'name',
   'phoneNumber',
 ] as const) {
