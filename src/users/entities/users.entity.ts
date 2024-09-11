@@ -14,6 +14,15 @@ export class UsersEntity extends BaseModel {
   name: string;
 
   @Column({
+    name: 'email',
+    type: 'varchar',
+    length: 100,
+    unique: true,
+  })
+  @Expose()
+  email: string;
+
+  @Column({
     name: 'password',
     type: 'varchar',
     length: 150,
@@ -26,15 +35,6 @@ export class UsersEntity extends BaseModel {
     update: false,
   })
   birth: Date;
-
-  @Column({
-    name: 'email',
-    type: 'varchar',
-    length: 100,
-    unique: true,
-  })
-  @Expose()
-  email: string;
 
   @Column({
     name: 'phone_number',

@@ -15,6 +15,10 @@ export class RegisterUserRequestDto {
   name: string;
 
   @IsString({ message: stringValidationMessage })
+  @IsEmail({}, { message: emailValidationMessage })
+  email: string;
+
+  @IsString({ message: stringValidationMessage })
   @Length(8, 25, {
     message: lengthValidationMessage,
   })
@@ -25,10 +29,6 @@ export class RegisterUserRequestDto {
   @IsDate()
   @DateAfter()
   birth: Date;
-
-  @IsString({ message: stringValidationMessage })
-  @IsEmail({}, { message: emailValidationMessage })
-  email: string;
 
   @IsString({ message: stringValidationMessage })
   @Length(13, 16, {
