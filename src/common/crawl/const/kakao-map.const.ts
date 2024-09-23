@@ -31,4 +31,5 @@ export const KAKAO_MAP_SEARCH_RESULT_MENU_PRICE =
 // 더보기 | 다음 페이지 버튼
 export const KAKAO_MAP_MORE_BTN = '#info\\.search\\.place\\.more';
 export const KAKAO_MAP_NEXT_BTN = '#info\\.search\\.page\\.next';
+export const KAKAO_MAP_SEARCH_RESULT_PAGE_NUM = 'a[id^="info.search.page.no"]';
 export const KAKAO_MAP_MENU_MORE_BTN = '.link_more';
