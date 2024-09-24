@@ -40,7 +40,7 @@ export class UsersService {
         },
       });
 
-      return findUser.id;
+      return findUser.email;
     } catch (error) {
       throw new BadRequestException('일치하는 정보가 없습니다.');
     }

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterUserRequestDto } from './dto/register-user-request.dto';
 import { FindUserEmailRequestDto } from './dto/find-user-email-request.dto';
@@ -15,6 +24,7 @@ export class UsersController {
   }
 
   @Get()
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
   async findUserEmail(@Query() user: FindUserEmailRequestDto) {
     return this.usersService.findUserEmail(user);
   }
