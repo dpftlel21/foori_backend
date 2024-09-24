@@ -7,6 +7,8 @@ import { UsersModule } from './users/users.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { CrawlModule } from './common/crawl/crawl.module';
+import { PlaceModule } from './place/place.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { CrawlModule } from './common/crawl/crawl.module';
     UsersModule,
     AuthModule,
     CrawlModule,
+    PlaceModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [

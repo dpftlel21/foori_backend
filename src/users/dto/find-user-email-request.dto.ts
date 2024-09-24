@@ -16,7 +16,7 @@ export class FindUserEmailRequestDto extends PickType(RegisterUserRequestDto, [
   name: string;
 
   @IsString({ message: stringValidationMessage })
-  @Length(13, 16, {
+  @Length(12, 15, {
     message: lengthValidationMessage,
   })
   @PhoneNumber()

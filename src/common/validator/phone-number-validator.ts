@@ -11,6 +11,12 @@ export class PhoneNumberValidator implements ValidatorConstraintInterface {
   private message: string;
 
   validate(phoneNumber: string, args: ValidationArguments) {
+    // phoneNumber가 존재하는지 먼저 확인
+    if (!phoneNumber) {
+      this.message = '휴대폰 번호가 입력되지 않았습니다.';
+      return false;
+    }
+
     // 길이 검사: 최소 13자 ~ 최대 16자
     if (phoneNumber.length < 13 || phoneNumber.length > 16) {
       this.message = '휴대폰 번호는 최소 13자에서 최대 16자여야 합니다.';

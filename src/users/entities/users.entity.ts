@@ -43,4 +43,7 @@ export class UsersEntity extends BaseModel {
     unique: true,
   })
   phoneNumber: string;
+
+  @Expose()
+  createdAt: Date;
 }
