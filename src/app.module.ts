@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { CrawlModule } from './common/crawl/crawl.module';
 import { PlaceModule } from './place/place.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     CrawlModule,
     PlaceModule,
     ReviewsModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [

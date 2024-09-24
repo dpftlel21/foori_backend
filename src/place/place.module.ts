@@ -9,5 +9,6 @@ import { MenuEntity } from '../common/crawl/entities/menu.entity';
   imports: [TypeOrmModule.forFeature([RestaurantEntity, MenuEntity])],
   controllers: [PlaceController],
   providers: [PlaceService],
+  exports: [PlaceService],
 })
 export class PlaceModule {}

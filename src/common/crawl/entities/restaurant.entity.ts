@@ -1,6 +1,7 @@
 import { BaseModel } from '../../entities/base-model';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { MenuEntity } from './menu.entity';
+import { ReviewEntity } from '../../../reviews/entities/review.entity';
 
 @Entity('restaurants', { schema: 'foori' })
 export class RestaurantEntity extends BaseModel {
@@ -74,4 +75,9 @@ export class RestaurantEntity extends BaseModel {
 
   @OneToMany(() => MenuEntity, (menu) => menu.restaurant, { cascade: true })
   menus: MenuEntity[];
+
+  @OneToMany(() => ReviewEntity, (review) => review.restaurant, {
+    cascade: true,
+  })
+  reviews: ReviewEntity[];
 }

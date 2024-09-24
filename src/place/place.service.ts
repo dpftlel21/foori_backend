@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RestaurantEntity } from '../common/crawl/entities/restaurant.entity';
 import { Repository } from 'typeorm';
@@ -18,5 +22,18 @@ export class PlaceService {
       where: { id },
       relations: ['menus'],
     });
+  }
+
+  async findRestaurantById(id: number) {
+    try {
+      const findRestaurant = await this.restaurantRepository.findOneOrFail({
+        where: { id },
+        relations: ['menus'],
+      });
+
+      return findRestaurant;
+    } catch (error) {
+      throw new NotFoundException('일치하는 식당 정보가 없습니다.');
+    }
   }
 }

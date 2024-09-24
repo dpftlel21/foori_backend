@@ -5,4 +5,6 @@ export class CreateReviewRequestDto {
   content: string;
   @IsNumber()
   rating: number;
+  @IsNumber()
+  restaurantId: number;
 }
