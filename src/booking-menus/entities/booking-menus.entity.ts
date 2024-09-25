@@ -4,6 +4,7 @@ import {
   ManyToOne,
   JoinColumn,
   PrimaryGeneratedColumn,
+  Check,
 } from 'typeorm';
 import { BookingEntity } from '../../booking/entities/booking.entity';
 import { MenuEntity } from '../../common/crawl/entities/menu.entity';
@@ -18,10 +19,11 @@ export class BookingMenuEntity {
     type: 'int',
     comment: '메뉴 수량',
   })
+  @Check(`"quantity" BETWEEN 0 AND 999`)
   quantity: number;
 
   @ManyToOne(() => BookingEntity, (booking) => booking.bookingMenus, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'booking_id' })
   booking: BookingEntity;

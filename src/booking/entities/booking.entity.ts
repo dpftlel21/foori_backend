@@ -1,10 +1,10 @@
-import { Column, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseModel } from '../../common/entities/base-model';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { RestaurantEntity } from '../../common/crawl/entities/restaurant.entity';
-import { MenuEntity } from '../../common/crawl/entities/menu.entity';
 import { BookingMenuEntity } from '../../booking-menus/entities/booking-menus.entity';
 
+@Entity('bookings', { schema: 'foori' })
 export class BookingEntity extends BaseModel {
   @Column({
     name: 'reservation_time',
