@@ -10,6 +10,7 @@ import { CrawlModule } from './common/crawl/crawl.module';
 import { PlaceModule } from './place/place.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { BookingModule } from './booking/booking.module';
+import { BookingMenusModule } from './booking-menus/booking-menus.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { BookingModule } from './booking/booking.module';
     PlaceModule,
     ReviewsModule,
     BookingModule,
+    BookingMenusModule,
   ],
   controllers: [AppController],
   providers: [

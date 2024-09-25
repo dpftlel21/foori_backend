@@ -1,6 +1,7 @@
 import { BaseModel } from '../../entities/base-model';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { RestaurantEntity } from './restaurant.entity';
+import { BookingMenuEntity } from '../../../booking-menus/entities/booking-menus.entity';
 
 @Entity('menus', { schema: 'foori' })
 export class MenuEntity extends BaseModel {
@@ -24,4 +25,7 @@ export class MenuEntity extends BaseModel {
   })
   @JoinColumn({ name: 'restaurant_id' })
   restaurant: RestaurantEntity;
+
+  @OneToMany(() => BookingMenuEntity, (bookingMenu) => bookingMenu.menu)
+  bookingMenus: BookingMenuEntity[];
 }

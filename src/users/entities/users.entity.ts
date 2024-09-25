@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseModel } from '../../common/entities/base-model';
 import { Exclude, Expose } from 'class-transformer';
 import { ReviewEntity } from '../../reviews/entities/review.entity';
+import { BookingEntity } from '../../booking/entities/booking.entity';
 
 @Exclude({ toPlainOnly: true })
 @Entity('users', { schema: 'foori' })
@@ -50,4 +51,7 @@ export class UsersEntity extends BaseModel {
 
   @OneToMany(() => ReviewEntity, (review) => review.user)
   reviews: ReviewEntity[];
+
+  @OneToMany(() => BookingEntity, (booking) => booking.user)
+  bookings: BookingEntity[];
 }

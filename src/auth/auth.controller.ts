@@ -1,11 +1,16 @@
-import { Body, Controller, Post, Headers, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Headers,
+  UseGuards,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserRequestDto } from '../users/dto/register-user-request.dto';
 import { LoginUserRequestDto } from './dto/login-user-request.dto';
-import {
-  AccessTokenGuard,
-  RefreshTokenGuard,
-} from './guard/bearer-token.guard';
+import { RefreshTokenGuard } from './guard/bearer-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -17,6 +22,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.CREATED)
   login(@Body() loginUserDto: LoginUserRequestDto) {
     return this.authService.loginWithEmail(loginUserDto);
   }
