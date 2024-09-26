@@ -15,5 +15,5 @@ async function bootstrap() {
   await app.listen(process.env.PORT);
 }
 bootstrap().then(() =>
-  console.log(`NestJS Fcm Server Start PORT : ${process.env.PORT}`),
+  console.log(`NestJS Foori Server Start PORT : ${process.env.PORT}`),
 );

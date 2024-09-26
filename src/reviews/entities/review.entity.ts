@@ -20,6 +20,20 @@ export class ReviewEntity extends BaseModel {
   })
   rating: number;
 
+  @Column({
+    name: 'booking_id',
+    type: 'int',
+    nullable: true,
+    comment: '예약 ID',
+  })
+  bookingId: number;
+
+  @Column({ name: 'user_id', type: 'int', nullable: true })
+  userId: number;
+
+  @Column({ name: 'restaurant_id', type: 'int', nullable: true })
+  restaurantId: number;
+
   @ManyToOne(() => UsersEntity, (user) => user.reviews, {
     onDelete: 'CASCADE',
   })

@@ -26,7 +26,7 @@ export class ReviewsService {
 
     const createdReview = this.reviewRepository.create({
       ...createReviewRequestDto,
-      user: verifyUser,
+      userId: verifyUser.id,
     });
 
     return await this.reviewRepository.save(createdReview);
