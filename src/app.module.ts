@@ -11,6 +11,7 @@ import { PlaceModule } from './place/place.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { BookingModule } from './booking/booking.module';
 import { BookingMenusModule } from './booking-menus/booking-menus.module';
+import { MenusModule } from './menus/menus.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { BookingMenusModule } from './booking-menus/booking-menus.module';
     ReviewsModule,
     BookingModule,
     BookingMenusModule,
+    MenusModule,
   ],
   controllers: [AppController],
   providers: [
