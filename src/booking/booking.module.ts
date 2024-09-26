@@ -8,6 +8,7 @@ import { BookingMenuEntity } from '../booking-menus/entities/booking-menus.entit
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { PlaceModule } from '../place/place.module';
+import { MenusModule } from '../menus/menus.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PlaceModule } from '../place/place.module';
     AuthModule,
     UsersModule,
     PlaceModule,
+    MenusModule,
   ],
   controllers: [BookingController],
   providers: [BookingService, BookingMenusService],

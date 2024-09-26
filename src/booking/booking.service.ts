@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateBookingRequestDto } from './dto/create-booking-request.dto';
 import { PlaceService } from '../place/place.service';
 import { UsersService } from '../users/users.service';
+import { MenusService } from '../menus/menus.service';
+import { BookingMenusService } from '../booking-menus/booking-menus.service';
 
 @Injectable()
 export class BookingService {
@@ -13,6 +15,8 @@ export class BookingService {
     private readonly bookingRepository: Repository<BookingEntity>,
     private readonly userService: UsersService,
     private readonly placeService: PlaceService,
+    private readonly menusService: MenusService,
+    private readonly bookingMenuService: BookingMenusService,
   ) {}
 
   async createBooking(
@@ -39,13 +43,25 @@ export class BookingService {
       restaurant: findRestaurant,
     });
 
-    // const savedBooking = await this.bookingRepository.save(createdBooking);
-    //
-    // let totalPrice = 0;
-    // for (const menu of createRequestDto.bookingMenus) {
-    //   totalPrice += menu.price * menu.quantity;
-    // }
+    const savedBooking = await this.bookingRepository.save(createdBooking);
 
-    return 0;
+    let totalPrice = 0;
+    for (const menuDto of createRequestDto.bookingMenus) {
+      const menu = await this.menusService.findMenuById(menuDto.menuId);
+      await this.bookingMenuService.createBookingMenu(
+        savedBooking,
+        menu,
+        menuDto.quantity,
+      );
+
+      // 메뉴 가격 합산 (단가 * 수량)
+      totalPrice += parseFloat(menu.price.replace(',', '')) * menuDto.quantity;
+    }
+
+    // 5. 예약 총 금액 업데이트
+    savedBooking.totalPrice = totalPrice;
+    const responseBooking = await this.bookingRepository.save(savedBooking);
+
+    return responseBooking;
   }
 }
