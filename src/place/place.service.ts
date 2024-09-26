@@ -1,12 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RestaurantEntity } from '../common/crawl/entities/restaurant.entity';
+import { RestaurantEntity } from './entities/restaurant.entity';
 import { Repository } from 'typeorm';
-import { MenuEntity } from '../common/crawl/entities/menu.entity';
+import { MenuEntity } from './entities/menu.entity';
 
 @Injectable()
 export class PlaceService {

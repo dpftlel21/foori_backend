@@ -4,7 +4,7 @@ import { BookingMenusController } from './booking-menus.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BookingMenuEntity } from './entities/booking-menus.entity';
 import { BookingEntity } from 'src/booking/entities/booking.entity';
-import { MenuEntity } from 'src/common/crawl/entities/menu.entity';
+import { MenuEntity } from 'src/place/entities/menu.entity';
 
 @Module({
   imports: [

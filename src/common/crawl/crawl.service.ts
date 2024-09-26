@@ -3,8 +3,8 @@ import { Injectable } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RestaurantEntity } from './entities/restaurant.entity';
-import { MenuEntity } from './entities/menu.entity';
+import { RestaurantEntity } from '../../place/entities/restaurant.entity';
+import { MenuEntity } from '../../place/entities/menu.entity';
 import {
   KAKAO_MAP_MENU_MORE_BTN,
   KAKAO_MAP_MORE_BTN,

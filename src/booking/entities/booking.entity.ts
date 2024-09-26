@@ -1,17 +1,24 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { BaseModel } from '../../common/entities/base-model';
 import { UsersEntity } from '../../users/entities/users.entity';
-import { RestaurantEntity } from '../../common/crawl/entities/restaurant.entity';
+import { RestaurantEntity } from '../../place/entities/restaurant.entity';
 import { BookingMenuEntity } from '../../booking-menus/entities/booking-menus.entity';
 
 @Entity('bookings', { schema: 'foori' })
 export class BookingEntity extends BaseModel {
   @Column({
-    name: 'reservation_time',
+    name: 'booking_date',
+    type: 'date',
+    comment: '예약 날짜',
+  })
+  bookingDate: Date;
+
+  @Column({
+    name: 'booking_time',
     type: 'timestamp',
     comment: '예약 시간',
   })
-  reservationTime: Date;
+  bookingTime: Date;
 
   @Column({
     name: 'num_of_people',

@@ -1,8 +1,8 @@
-import { BaseModel } from '../../entities/base-model';
+import { BaseModel } from '../../common/entities/base-model';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { MenuEntity } from './menu.entity';
-import { ReviewEntity } from '../../../reviews/entities/review.entity';
-import { BookingEntity } from '../../../booking/entities/booking.entity';
+import { ReviewEntity } from '../../reviews/entities/review.entity';
+import { BookingEntity } from '../../booking/entities/booking.entity';
 
 @Entity('restaurants', { schema: 'foori' })
 export class RestaurantEntity extends BaseModel {
