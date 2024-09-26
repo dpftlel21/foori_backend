@@ -7,7 +7,7 @@ import {
   Check,
 } from 'typeorm';
 import { BookingEntity } from '../../booking/entities/booking.entity';
-import { MenuEntity } from '../../place/entities/menu.entity';
+import { MenuEntity } from '../../menus/entities/menu.entity';
 
 @Entity('booking_menus', { schema: 'foori' })
 export class BookingMenuEntity {

@@ -1,6 +1,6 @@
 import { BaseModel } from '../../common/entities/base-model';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { RestaurantEntity } from './restaurant.entity';
+import { RestaurantEntity } from '../../place/entities/restaurant.entity';
 import { BookingMenuEntity } from '../../booking-menus/entities/booking-menus.entity';
 
 @Entity('menus', { schema: 'foori' })

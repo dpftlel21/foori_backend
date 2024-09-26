@@ -4,7 +4,7 @@ import puppeteer from 'puppeteer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RestaurantEntity } from '../../place/entities/restaurant.entity';
-import { MenuEntity } from '../../place/entities/menu.entity';
+import { MenuEntity } from '../../menus/entities/menu.entity';
 import {
   KAKAO_MAP_MENU_MORE_BTN,
   KAKAO_MAP_MORE_BTN,

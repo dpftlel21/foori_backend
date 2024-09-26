@@ -1,6 +1,6 @@
 import { BaseModel } from '../../common/entities/base-model';
 import { Column, Entity, OneToMany } from 'typeorm';
-import { MenuEntity } from './menu.entity';
+import { MenuEntity } from '../../menus/entities/menu.entity';
 import { ReviewEntity } from '../../reviews/entities/review.entity';
 import { BookingEntity } from '../../booking/entities/booking.entity';
 

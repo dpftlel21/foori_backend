@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BookingMenuEntity } from './entities/booking-menus.entity';
 import { Repository } from 'typeorm';
 import { BookingEntity } from '../booking/entities/booking.entity';
-import { MenuEntity } from '../place/entities/menu.entity';
+import { MenuEntity } from '../menus/entities/menu.entity';
 
 @Injectable()
 export class BookingMenusService {

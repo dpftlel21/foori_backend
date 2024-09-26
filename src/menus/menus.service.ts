@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MenuEntity } from '../place/entities/menu.entity';
+import { MenuEntity } from './entities/menu.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -10,10 +10,10 @@ export class MenusService {
     private readonly menuRepository: Repository<MenuEntity>,
   ) {}
 
-  async findMenuById(menuId: number) {
+  async findMenuById(menuId: number, restaurantId: number) {
     try {
       const findMenu = await this.menuRepository.findOneOrFail({
-        where: { id: menuId },
+        where: { id: menuId, restaurant: { id: restaurantId } },
       });
 
       return findMenu;

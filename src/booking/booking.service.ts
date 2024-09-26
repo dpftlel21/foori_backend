@@ -47,7 +47,10 @@ export class BookingService {
 
     let totalPrice = 0;
     for (const menuDto of createRequestDto.bookingMenus) {
-      const menu = await this.menusService.findMenuById(menuDto.menuId);
+      const menu = await this.menusService.findMenuById(
+        menuDto.menuId,
+        findRestaurant.id,
+      );
       await this.bookingMenuService.createBookingMenu(
         savedBooking,
         menu,

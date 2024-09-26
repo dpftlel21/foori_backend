@@ -3,7 +3,7 @@ import { CrawlService } from './crawl.service';
 import { CrawlController } from './crawl.controller';
 import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MenuEntity } from '../../place/entities/menu.entity';
+import { MenuEntity } from '../../menus/entities/menu.entity';
 import { RestaurantEntity } from '../../place/entities/restaurant.entity';
 
 @Module({
