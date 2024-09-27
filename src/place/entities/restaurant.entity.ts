@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { MenuEntity } from '../../menus/entities/menu.entity';
 import { ReviewEntity } from '../../reviews/entities/review.entity';
 import { BookingEntity } from '../../booking/entities/booking.entity';
+import { FavoritesEntity } from '../../common/entities/favorites.entity';
 
 @Entity('restaurants', { schema: 'foori' })
 export class RestaurantEntity extends BaseModel {
@@ -86,4 +87,7 @@ export class RestaurantEntity extends BaseModel {
     cascade: true,
   })
   bookings: BookingEntity[];
+
+  @OneToMany(() => FavoritesEntity, (favorites) => favorites.restaurant)
+  favorites: FavoritesEntity[];
 }
