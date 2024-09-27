@@ -3,6 +3,7 @@ import { BaseModel } from '../../common/entities/base-model';
 import { Exclude, Expose } from 'class-transformer';
 import { ReviewEntity } from '../../reviews/entities/review.entity';
 import { BookingEntity } from '../../booking/entities/booking.entity';
+import { LikeEntity } from '../../common/entities/like.entity';
 
 @Exclude({ toPlainOnly: true })
 @Entity('users', { schema: 'foori' })
@@ -54,4 +55,7 @@ export class UsersEntity extends BaseModel {
 
   @OneToMany(() => BookingEntity, (booking) => booking.user)
   bookings: BookingEntity[];
+
+  @OneToMany(() => LikeEntity, (like) => like.user)
+  likes: LikeEntity[];
 }

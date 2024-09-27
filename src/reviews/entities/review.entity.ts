@@ -1,7 +1,8 @@
 import { BaseModel } from '../../common/entities/base-model';
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { RestaurantEntity } from '../../place/entities/restaurant.entity';
+import { LikeEntity } from '../../common/entities/like.entity';
 
 @Entity('reviews', { schema: 'foori' })
 export class ReviewEntity extends BaseModel {
@@ -45,4 +46,7 @@ export class ReviewEntity extends BaseModel {
   })
   @JoinColumn({ name: 'restaurant_id' })
   restaurant: RestaurantEntity;
+
+  @OneToMany(() => LikeEntity, (like) => like.review)
+  likes: LikeEntity[];
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ReviewEntity } from './entities/review.entity';
 import { Repository } from 'typeorm';
@@ -30,5 +30,17 @@ export class ReviewsService {
     });
 
     return await this.reviewRepository.save(createdReview);
+  }
+
+  async findReviewById(reviewId: number) {
+    try {
+      const findReview = await this.reviewRepository.findOneOrFail({
+        where: { id: reviewId },
+      });
+
+      return findReview;
+    } catch (error) {
+      throw new NotFoundException('일치하는 리뷰 정보가 없습니다.');
+    }
   }
 }
