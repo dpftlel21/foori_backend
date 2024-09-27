@@ -12,6 +12,9 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { BookingModule } from './booking/booking.module';
 import { BookingMenusModule } from './booking-menus/booking-menus.module';
 import { MenusModule } from './menus/menus.module';
+import { LikesModule } from './likes/likes.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { UserLogsModule } from './user-logs/user-logs.module';
 
 @Module({
   imports: [
@@ -42,6 +45,9 @@ import { MenusModule } from './menus/menus.module';
     BookingModule,
     BookingMenusModule,
     MenusModule,
+    LikesModule,
+    FavoritesModule,
+    UserLogsModule,
   ],
   controllers: [AppController],
   providers: [
