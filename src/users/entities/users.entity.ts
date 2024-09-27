@@ -48,6 +48,14 @@ export class UsersEntity extends BaseModel {
   })
   phoneNumber: string;
 
+  @Column({
+    name: 'status',
+    type: 'tinyint',
+    default: 1,
+    comment: '사용자 상태(1: 일반회원, 2: 소설회원, 4: 휴면회원 9: 탈퇴회원)',
+  })
+  status: number;
+
   @Expose()
   createdAt: Date;
 
