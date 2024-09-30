@@ -15,10 +15,27 @@ import { MenusModule } from './menus/menus.module';
 import { LikesModule } from './common/likes/likes.module';
 import { FavoritesModule } from './common/favorites/favorites.module';
 import { UserLogsModule } from './user-logs/user-logs.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { MailModule } from './common/mail/mail.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersModule]),
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+        defaults: {
+          from: '"nest-modules" <modules@nestjs.com>',
+        },
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new PugAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
@@ -48,6 +65,7 @@ import { UserLogsModule } from './user-logs/user-logs.module';
     LikesModule,
     FavoritesModule,
     UserLogsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
