@@ -16,6 +16,7 @@ import { LikesModule } from './common/likes/likes.module';
 import { FavoritesModule } from './common/favorites/favorites.module';
 import { UserLogsModule } from './user-logs/user-logs.module';
 import { MailModule } from './common/mail/mail.module';
+import { CacheModule } from './common/cache/cache.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { MailModule } from './common/mail/mail.module';
     FavoritesModule,
     UserLogsModule,
     MailModule,
+    CacheModule,
   ],
   controllers: [AppController],
   providers: [

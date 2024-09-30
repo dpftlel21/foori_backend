@@ -10,4 +10,17 @@ export class MailController {
   async sendVerificationEmail(@Body('email') email: string) {
     return this.mailService.sendVerificationEmail(email);
   }
+
+  @Post('verify-code')
+  async verifyCode(@Body('email') email: string, @Body('code') code: string) {
+    const result = await this.mailService.verifyCode(email, code);
+
+    if (result === 1) {
+      return { message: `Verification successful: ${email} / ${code}` };
+    } else {
+      return {
+        message: `Invalid or expired verification code: ${email} / ${code}`,
+      };
+    }
+  }
 }

@@ -11,3 +11,6 @@ services:
       MYSQL_DATABASE: ${FOORI_MYSQL_DATABASE}
       MYSQL_USER: ${FOORI_MYSQL_USER}
       MYSQL_PASSWORD: ${FOORI_MYSQL_PASSWORD}
+
+volumes:
+  mariadb-data:
