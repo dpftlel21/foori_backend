@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { CacheService } from '../cache/cache.service';
 import { ConfigService } from '@nestjs/config';
@@ -9,14 +9,22 @@ export class MailService {
     private readonly mailerService: MailerService,
     private readonly cacheService: CacheService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    console.log('hi');
+    console.log('Connecting to Redis:', {
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT,
+      password: process.env.REDIS_PASSWORD,
+      db: process.env.REDIS_DB,
+    });
+  }
 
   // 인증 이메일 보내기
   async sendVerificationEmail(to: string) {
     const verificationCode = await this.generateVerificationTokenCode();
     await this.verifyGenerateTokenCode(verificationCode);
 
-    // ConfigService를 사용해 환경 변수 불러오기
+    //ConfigService를 사용해 환경 변수 불러오기
     const expiresIn = this.configService.get<number>('REDIS_MAIL_EXPIRES_IN');
 
     // Redis에 인증 코드 저장
@@ -60,26 +68,38 @@ export class MailService {
     }
   }
 
-  async verifyCode(to: string, inputCode: string) {
-    const storedCode = await this.cacheService.redisGet(
-      `verification_code:${to}`,
-    );
-    console.log('Stored code:', storedCode);
+  async verifyCode(to: string, inputCode: string): Promise<number> {
+    try {
+      const storedCode = await this.cacheService.redisGet(
+        `verification_code:${to}`,
+      );
+      console.log('Stored code:', storedCode);
 
-    if (!storedCode) {
-      console.log('인증번호가 만료되었거나 존재하지 않습니다.');
-      return 1;
-    }
+      if (!storedCode) {
+        console.log('인증번호가 만료되었거나 존재하지 않습니다.');
+        throw new HttpException(
+          '인증번호가 만료되었거나 존재하지 않습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    if (storedCode === inputCode) {
-      console.log('인증번호가 일치합니다.');
-
-      // 인증 성공 시 Redis에서 데이터 삭제
-      await this.cacheService.redisDel(`verification_code:${to}`);
-      return 1;
-    } else {
-      console.log('인증번호가 일치하지 않습니다.');
-      return 0;
+      if (storedCode === inputCode) {
+        console.log('인증번호가 일치합니다.');
+        await this.cacheService.redisDel(`verification_code:${to}`);
+        return 1;
+      } else {
+        console.log('인증번호가 일치하지 않습니다.');
+        throw new HttpException(
+          '인증번호가 일치하지 않습니다.',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+    } catch (error) {
+      console.error('Verification code check failed', error);
+      throw new HttpException(
+        '인증번호 검증 실패',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
