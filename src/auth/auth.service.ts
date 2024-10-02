@@ -6,6 +6,7 @@ import { LoginUserRequestDto } from './dto/login-user-request.dto';
 import { RegisterUserRequestDto } from '../users/dto/register-user-request.dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import axios from 'axios';
 
 @Injectable()
 export class AuthService {
@@ -174,5 +175,100 @@ export class AuthService {
     }
 
     return findUser;
+  }
+
+  /**
+   * 카카오 로그인 URL을 가져오는 함수
+   */
+  async getKakaoLoginUrl() {
+    const clientId = this.configService.get<string>('KAKAO_CLIENT_ID');
+    const clientSecret = this.configService.get<string>(
+      'KAKAO_CLIENT_SECRET_KEY',
+    );
+    const redirectUri = this.configService.get<string>('KAKAO_REDIRECT_URI');
+
+    return `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&client_secret=${clientSecret}`;
+  }
+
+  /**
+   * 카카오에서 받은 code를 이용해 accessToken을 가져오는 함수
+   * @param code
+   */
+  async getKakaoAccessToken(code: string): Promise<string> {
+    const tokenUrl = 'https://kauth.kakao.com/oauth/token';
+    const clientId = this.configService.get<string>('KAKAO_CLIENT_ID'); // REST API Key
+    const clientSecret = this.configService.get<string>(
+      'KAKAO_CLIENT_SECRET_KEY',
+    );
+    const redirectUri = this.configService.get<string>('KAKAO_REDIRECT_URI'); // Redirect URI
+
+    try {
+      const response = await axios.post(
+        tokenUrl,
+        null, // Body 없이 params로 전달
+        {
+          params: {
+            grant_type: 'authorization_code',
+            client_id: clientId, // 카카오 콘솔에서 발급받은 REST API Key
+            redirect_uri: redirectUri, // 카카오 콘솔에 등록한 Redirect URI
+            code: code, // 카카오에서 받은 인가 코드
+            client_secret: clientSecret,
+          },
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        },
+      );
+
+      console.log(`Access Token Response: ${response.data}`);
+      return response.data.access_token; // 액세스 토큰 반환
+    } catch (error) {
+      console.error(
+        'Failed to get Kakao access token:',
+        error.response?.data || error.message,
+      );
+      throw new UnauthorizedException('Failed to get Kakao access token');
+    }
+  }
+
+  /**
+   * 카카오에서 받은 accessToken을 이용해 사용자 정보를 가져오는 함수
+   * @param accessToken
+   */
+  async getKakaoUserInfo(accessToken: string) {
+    const userInfoUrl = 'https://kapi.kakao.com/v2/user/me';
+
+    const userInfoResponse = await axios.get(userInfoUrl, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log(`userInfoResponse: ${userInfoResponse.data}`);
+    return userInfoResponse.data;
+  }
+
+  /**
+   * 카카오 로그인을 진행하는 함수
+   * @param kakaoUserInfo
+   */
+  async loginWithKakao(kakaoUserInfo: any) {
+    const email = kakaoUserInfo.kakao_account.email;
+    console.log(`email: ${email}`);
+
+    const findUser = await this.usersService.findUserByEmail(email);
+
+    if (!findUser) {
+      const createUser = await this.usersService.createUser({
+        email,
+        password: '',
+        name: kakaoUserInfo.properties.nickname,
+        birth: new Date('1990-01-01'),
+        phoneNumber: '010-0000-0000',
+      });
+
+      return this.loginUser(createUser);
+    }
+
+    return this.loginUser(findUser);
   }
 }

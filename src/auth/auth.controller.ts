@@ -6,6 +6,9 @@ import {
   UseGuards,
   HttpStatus,
   HttpCode,
+  Get,
+  Redirect,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserRequestDto } from '../users/dto/register-user-request.dto';
@@ -25,6 +28,22 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   login(@Body() loginUserDto: LoginUserRequestDto) {
     return this.authService.loginWithEmail(loginUserDto);
+  }
+
+  @Get('login/kakao')
+  @Redirect()
+  async kakaoLogin() {
+    const kakaoAuthUrl = await this.authService.getKakaoLoginUrl();
+    return { url: kakaoAuthUrl };
+  }
+
+  @Get('login/kakao/callback')
+  async kakaoCallback(@Query('code') code: string) {
+    const kakaoToken = await this.authService.getKakaoAccessToken(code);
+    console.log(`kakaoToken: ${kakaoToken}`);
+    const userInfo = await this.authService.getKakaoUserInfo(kakaoToken);
+    console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
+    return this.authService.loginWithKakao(userInfo);
   }
 
   @Post('token/access')
