@@ -6,6 +6,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthKakaoService } from './auth-kakao.service';
 import { SocialAccountsModule } from '../social-accounts/social-accounts.module';
 import { AuthNaverService } from './auth-naver.service';
+import { AuthGoogleService } from './auth-google.service';
 
 @Module({
   imports: [
@@ -14,7 +15,12 @@ import { AuthNaverService } from './auth-naver.service';
     forwardRef(() => SocialAccountsModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthKakaoService, AuthNaverService],
-  exports: [AuthService, AuthKakaoService, AuthNaverService],
+  providers: [
+    AuthService,
+    AuthKakaoService,
+    AuthNaverService,
+    AuthGoogleService,
+  ],
+  exports: [AuthService, AuthKakaoService, AuthNaverService, AuthGoogleService],
 })
 export class AuthModule {}
