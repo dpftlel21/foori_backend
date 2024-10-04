@@ -12,6 +12,7 @@ import { AuthKakaoService } from '../auth/auth-kakao.service';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../common/decorator/user/user.decorator';
 import { AuthNaverService } from '../auth/auth-naver.service';
+import { AuthGoogleService } from '../auth/auth-google.service';
 
 @Controller('social-accounts')
 export class SocialAccountsController {
@@ -19,6 +20,7 @@ export class SocialAccountsController {
     private readonly socialAccountsService: SocialAccountsService,
     private readonly authKakaoService: AuthKakaoService,
     private readonly authNaverService: AuthNaverService,
+    private readonly authGoogleService: AuthGoogleService,
   ) {}
 
   // 공통 함수로 카카오 로그인 URL을 생성
@@ -133,5 +135,63 @@ export class SocialAccountsController {
 
     // 사용자 정보로 로그인 처리
     return this.authNaverService.loginWithNaver(userInfo);
+  }
+
+  // 구글 로그인 URL로 리다이렉트
+  @Get('connect/google')
+  @Redirect()
+  async googleLogin() {
+    const googleAuthUrl = await this.authGoogleService.getGoogleLoginUrl();
+
+    return { url: googleAuthUrl };
+  }
+
+  // 구글 계정 연동 콜백 처리
+  @Get('connect/google/callback')
+  @UseGuards(AccessTokenGuard) // 로그인된 사용자만 계정 연동 가능
+  async googleConnectCallback(
+    @Query('code') code: string,
+    @User('id') userId: number, // 로그인된 사용자의 ID 가져오기
+  ) {
+    console.log(`userId: ${userId}`);
+
+    // 구글 액세스 토큰 가져오기
+    const googleToken = await this.authGoogleService.getGoogleAccessToken(code);
+    console.log(`googleToken: ${googleToken}`);
+
+    // 구글 사용자 정보 가져오기
+    const userInfo =
+      await this.authGoogleService.getGoogleUserInfo(googleToken);
+    console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
+
+    try {
+      // 구글 계정 연동
+      const createdSocialAccount =
+        await this.authGoogleService.linkGoogleAccount(userId, userInfo);
+      console.log('Successfully linked Google account');
+      return createdSocialAccount;
+    } catch (error) {
+      console.error('Error during Google account linking:', error);
+      throw error; // 에러 발생 시 처리
+    }
+  }
+
+  // 구글 로그인 콜백 처리
+  @Get('login/google/callback')
+  async googleCallback(@Query('code') code: string) {
+    const googleToken = await this.authGoogleService.getGoogleAccessToken(code);
+    console.log(`googleToken: ${googleToken}`);
+
+    // 구글 사용자 정보 요청
+    const userInfo =
+      await this.authGoogleService.getGoogleUserInfo(googleToken);
+    console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
+
+    // 사용자 정보로 로그인 처리
+    try {
+      return this.authGoogleService.loginWithGoogle(userInfo);
+    } catch (error) {
+      console.error('Error during Google login:', error);
+    }
   }
 }
