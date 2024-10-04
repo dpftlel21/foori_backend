@@ -7,12 +7,13 @@ import {
   Unique,
 } from 'typeorm';
 import { UsersEntity } from './users.entity';
+import { SocialProvider } from '../../social-accounts/enum/social-provider';
 
 @Entity('social_accounts')
 @Unique(['socialId', 'provider']) // provider와 socialId의 복합 유니크 제약
 export class SocialAccountsEntity {
   @PrimaryGeneratedColumn()
-  id: number; // 테이블의 고유 ID
+  id: number;
 
   @Column({
     name: 'social_id',
@@ -20,15 +21,15 @@ export class SocialAccountsEntity {
     length: 255,
     comment: '소셜 로그인 제공자에서 발급된 사용자 ID',
   })
-  socialId: string; // 소셜 로그인 제공자에서 발급된 사용자 ID
+  socialId: string;
 
   @Column({
     name: 'provider',
-    type: 'varchar',
-    length: 50,
+    type: 'enum',
+    enum: SocialProvider,
     comment: '소셜 로그인 제공자',
   })
-  provider: string; // 소셜 로그인 제공자 (kakao, naver, google)
+  provider: SocialProvider;
 
   @Column({
     name: 'user_id',

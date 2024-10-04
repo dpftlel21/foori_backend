@@ -10,6 +10,12 @@ export class SocialAccountsService {
     private readonly socialAccountsRepository: Repository<SocialAccountsEntity>,
   ) {}
 
+  /**
+   * 소셜 계정을 생성하는 함수
+   * @param userId
+   * @param socialId
+   * @param provider
+   */
   async createSocialAccount(
     userId: number,
     socialId: string,
@@ -24,7 +30,13 @@ export class SocialAccountsService {
     return await this.socialAccountsRepository.save(createdSocialAccount);
   }
 
-  async findSocialAccountBySocialIdAndUserIdAndProvicer(
+  /**
+   * 소셜 계정의 유무를 검증하는 함수
+   * @param userId
+   * @param socialId
+   * @param provider
+   */
+  async verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
     userId: number,
     socialId: string,
     provider: string,

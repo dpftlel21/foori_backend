@@ -4,6 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import axios from 'axios';
 import { AuthService } from './auth.service';
 import { SocialAccountsService } from '../social-accounts/social-accounts.service';
+import { SocialProvider } from '../social-accounts/enum/social-provider';
 
 @Injectable()
 export class AuthKakaoService {
@@ -113,10 +114,10 @@ export class AuthKakaoService {
     const socialId = kakaoUserInfo.kakao_account.id;
     console.log(`social ID: ${socialId}`);
     const findUser =
-      await this.socialAccountsService.findSocialAccountBySocialIdAndUserIdAndProvicer(
+      await this.socialAccountsService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
         userId,
         socialId,
-        'kakao',
+        SocialProvider.KAKAO,
       );
 
     if (findUser) {
@@ -126,7 +127,7 @@ export class AuthKakaoService {
     const savedSocialLinkInfo = this.socialAccountsService.createSocialAccount(
       userId,
       socialId,
-      'kakao',
+      SocialProvider.KAKAO,
     );
 
     return savedSocialLinkInfo;
