@@ -11,12 +11,14 @@ import { Response } from 'express';
 import { AuthKakaoService } from '../auth/auth-kakao.service';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../common/decorator/user/user.decorator';
+import { AuthNaverService } from '../auth/auth-naver.service';
 
 @Controller('social-accounts')
 export class SocialAccountsController {
   constructor(
     private readonly socialAccountsService: SocialAccountsService,
     private readonly authKakaoService: AuthKakaoService,
+    private readonly authNaverService: AuthNaverService,
   ) {}
 
   // 공통 함수로 카카오 로그인 URL을 생성
@@ -31,9 +33,8 @@ export class SocialAccountsController {
     return { url: kakaoAuthUrl };
   }
 
-  // 2. 카카오 계정 연동 콜백 처리 (로그인된 상태에서)
   @Get('connect/kakao/callback')
-  @UseGuards(AccessTokenGuard) // 로그인된 사용자만 연동 가능
+  @UseGuards(AccessTokenGuard)
   async kakaoConnectCallback(
     @Query('code') code: string,
     @User('id') userId: number,
@@ -75,29 +76,62 @@ export class SocialAccountsController {
     }
   }
 
-  // // 네이버 로그인 리다이렉트
-  // @Get('login/naver')
-  // @Redirect()
-  // async naverLogin() {
-  //   const naverAuthUrl = await this.authService.getNaverLoginUrl();
-  //   return { url: naverAuthUrl };
-  // }
-  //
-  // // 네이버 로그인 콜백 처리
-  // @Get('login/naver/callback')
-  // async naverCallback(
-  //   @Query('code') code: string,
-  //   @Query('state') state: string,
-  // ) {
-  //   // 네이버 토큰 요청
-  //   const naverToken = await this.authService.getNaverAccessToken(code, state);
-  //   console.log(`naverToken: ${naverToken}`);
-  //
-  //   // 네이버 사용자 정보 요청
-  //   const userInfo = await this.authService.getNaverUserInfo(naverToken);
-  //   console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
-  //
-  //   // 사용자 정보로 로그인 처리
-  //   return this.authService.loginWithNaver(userInfo);
-  // }
+  @Get('connect/naver')
+  @Redirect()
+  async naverLogin() {
+    const naverAuthUrl = await this.authNaverService.getNaverLoginUrl();
+    return { url: naverAuthUrl };
+  }
+
+  @Get('connect/naver/callback')
+  @UseGuards(AccessTokenGuard)
+  async naverConnectCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+    @User('id') userId: number,
+    // @Res() res: Response,
+  ) {
+    console.log(`userId: ${userId}`);
+    const naverToken = await this.authNaverService.getNaverAccessToken(
+      code,
+      state,
+    );
+    console.log(`naverToken: ${naverToken}`);
+    const userInfo = await this.authNaverService.getNaverUserInfo(naverToken);
+    console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
+
+    try {
+      const createdSocialAccount = await this.authNaverService.linkNaverAccount(
+        userId,
+        userInfo,
+      );
+      console.log('Successfully linked Naver account');
+      // return res.redirect('/profile');
+      return createdSocialAccount;
+    } catch (error) {
+      console.error('Error during Naver account linking:', error);
+      // return res.redirect('/profile');
+    }
+  }
+
+  // 네이버 로그인 콜백 처리
+  @Get('login/naver/callback')
+  async naverCallback(
+    @Query('code') code: string,
+    @Query('state') state: string,
+  ) {
+    // 네이버 토큰 요청
+    const naverToken = await this.authNaverService.getNaverAccessToken(
+      code,
+      state,
+    );
+    console.log(`naverToken: ${naverToken}`);
+
+    // 네이버 사용자 정보 요청
+    const userInfo = await this.authNaverService.getNaverUserInfo(naverToken);
+    console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
+
+    // 사용자 정보로 로그인 처리
+    return this.authNaverService.loginWithNaver(userInfo);
+  }
 }

@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { AuthKakaoService } from './auth-kakao.service';
 import { SocialAccountsModule } from '../social-accounts/social-accounts.module';
+import { AuthNaverService } from './auth-naver.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { SocialAccountsModule } from '../social-accounts/social-accounts.module'
     forwardRef(() => SocialAccountsModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthKakaoService],
-  exports: [AuthService, AuthKakaoService],
+  providers: [AuthService, AuthKakaoService, AuthNaverService],
+  exports: [AuthService, AuthKakaoService, AuthNaverService],
 })
 export class AuthModule {}

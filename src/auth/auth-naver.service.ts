@@ -1,9 +1,15 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { SocialAccountsService } from '../social-accounts/social-accounts.service';
 import axios from 'axios';
+import { SocialProvider } from '../social-accounts/enum/social-provider';
+import { EntityNotFoundError } from 'typeorm';
 
 @Injectable()
 export class AuthNaverService {
@@ -32,7 +38,9 @@ export class AuthNaverService {
   async getNaverAccessToken(code: string, state: string): Promise<string> {
     const tokenUrl = 'https://nid.naver.com/oauth2.0/token';
     const clientId = this.configService.get<string>('NAVER_CLIENT_ID');
-    const clientSecret = this.configService.get<string>('NAVER_CLIENT_SECRET');
+    const clientSecret = this.configService.get<string>(
+      'NAVER_CLIENT_SECRET_KEY',
+    );
     const redirectUri = this.configService.get<string>('NAVER_REDIRECT_URI');
 
     try {
@@ -48,6 +56,7 @@ export class AuthNaverService {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       });
 
+      console.log('Naver access token:', response);
       return response.data.access_token;
     } catch (error) {
       console.error(
@@ -87,20 +96,75 @@ export class AuthNaverService {
    * @param naverUserInfo
    */
   async loginWithNaver(naverUserInfo: any) {
-    const email = naverUserInfo.email;
-    const naverUserId = naverUserInfo.id;
+    const socialId = naverUserInfo.id;
+    console.log(`social ID: ${socialId}`);
 
     // 이메일로 기존 회원 조회
-    const findUser = await this.usersService.findUserByEmail(email);
+    const findUserId =
+      await this.socialAccountService.findUserIdBySocialIdAndProvider(
+        socialId,
+        SocialProvider.NAVER,
+      );
 
-    if (findUser) {
+    const findUserSocialAccount =
+      await this.socialAccountService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
+        {
+          userId: findUserId,
+          socialId,
+          provider: SocialProvider.NAVER,
+        },
+      );
+
+    if (!findUserSocialAccount) {
       throw new UnauthorizedException(
         '소셜 계정이 연동되지 않았습니다. 일반 로그인 후 소셜 계정을 연동해 주세요.',
       );
     }
 
+    const findUser = await this.usersService.findUserById(
+      findUserSocialAccount.userId,
+    );
+
     return this.authService.loginUser(findUser);
   }
 
-  //
+  async linkNaverAccount(userId: number, naverUserInfo: any) {
+    const socialId = naverUserInfo.id;
+    console.log(`social ID: ${socialId}`);
+    const provider = SocialProvider.NAVER;
+
+    try {
+      const findUser =
+        await this.socialAccountService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
+          {
+            userId,
+            socialId,
+            provider,
+          },
+        );
+
+      if (findUser) {
+        throw new UnauthorizedException('이미 연동된 소셜 계정 입니다.');
+      }
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        console.log('연동되지 않은 네이버 계정입니다. 연동을 진행합니다.');
+        const createSocialAccountLinkRequestDto = {
+          userId,
+          socialId,
+          provider,
+        };
+        const savedSocialLinkInfo =
+          this.socialAccountService.createSocialAccount(
+            createSocialAccountLinkRequestDto,
+          );
+        return savedSocialLinkInfo;
+      } else {
+        throw new InternalServerErrorException(
+          'Failed to link Naver account',
+          error.message,
+        );
+      }
+    }
+  }
 }

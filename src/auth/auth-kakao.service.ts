@@ -94,7 +94,7 @@ export class AuthKakaoService {
    */
   async loginWithKakao(kakaoUserInfo: any) {
     const socialId = kakaoUserInfo.id;
-    console.log(`email: ${socialId}`);
+    console.log(`social ID: ${socialId}`);
     const findUserId =
       await this.socialAccountsService.findUserIdBySocialIdAndProvider(
         socialId,
@@ -132,13 +132,14 @@ export class AuthKakaoService {
   async linkKakaoAccount(userId: number, kakaoUserInfo: any) {
     const socialId = kakaoUserInfo.id;
     console.log(`social ID: ${socialId}`);
+    const provider = SocialProvider.KAKAO;
     try {
       const findUser =
         await this.socialAccountsService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
           {
             userId,
             socialId,
-            provider: SocialProvider.KAKAO,
+            provider,
           },
         );
 
@@ -152,13 +153,14 @@ export class AuthKakaoService {
           this.socialAccountsService.createSocialAccount({
             userId,
             socialId,
-            provider: SocialProvider.KAKAO,
+            provider,
           });
 
         return savedSocialLinkInfo;
       } else {
         throw new InternalServerErrorException(
           '소셜 계정 연동 중 오류가 발생했습니다.',
+          error.message,
         );
       }
     }
