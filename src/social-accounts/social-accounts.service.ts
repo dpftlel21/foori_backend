@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SocialAccountsEntity } from '../users/entities/social-accounts.entity';
 import { Repository } from 'typeorm';
+import { CreateSocialAccountLinkRequestDto } from './dto/create-social-account-link-request.dto';
 
 @Injectable()
 export class SocialAccountsService {
@@ -17,10 +18,9 @@ export class SocialAccountsService {
    * @param provider
    */
   async createSocialAccount(
-    userId: number,
-    socialId: string,
-    provider: string,
+    createSocialAccountLinkRequestDto: CreateSocialAccountLinkRequestDto,
   ) {
+    const { userId, socialId, provider } = createSocialAccountLinkRequestDto;
     const createdSocialAccount = this.socialAccountsRepository.create({
       userId,
       socialId,
@@ -37,10 +37,9 @@ export class SocialAccountsService {
    * @param provider
    */
   async verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
-    userId: number,
-    socialId: string,
-    provider: string,
+    createSocialAccountLinkRequestDto: CreateSocialAccountLinkRequestDto,
   ) {
+    const { userId, socialId, provider } = createSocialAccountLinkRequestDto;
     try {
       const findSocialAccount = this.socialAccountsRepository.findOneOrFail({
         where: {

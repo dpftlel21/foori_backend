@@ -115,20 +115,22 @@ export class AuthKakaoService {
     console.log(`social ID: ${socialId}`);
     const findUser =
       await this.socialAccountsService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
-        userId,
-        socialId,
-        SocialProvider.KAKAO,
+        {
+          userId,
+          socialId,
+          provider: SocialProvider.KAKAO,
+        },
       );
 
     if (findUser) {
       throw new UnauthorizedException('이미 연동된 소셜 계정 입니다.');
     }
 
-    const savedSocialLinkInfo = this.socialAccountsService.createSocialAccount(
+    const savedSocialLinkInfo = this.socialAccountsService.createSocialAccount({
       userId,
       socialId,
-      SocialProvider.KAKAO,
-    );
+      provider: SocialProvider.KAKAO,
+    });
 
     return savedSocialLinkInfo;
   }
