@@ -17,6 +17,8 @@ import { FavoritesModule } from './common/favorites/favorites.module';
 import { UserLogsModule } from './user-logs/user-logs.module';
 import { MailModule } from './common/mail/mail.module';
 import { CacheModule } from './common/cache/cache.module';
+import { SocialAccountModule } from './social-account/social-account.module';
+import { SocialAccountsModule } from './social-accounts/social-accounts.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { CacheModule } from './common/cache/cache.module';
     UserLogsModule,
     MailModule,
     CacheModule,
+    SocialAccountModule,
+    SocialAccountsModule,
   ],
   controllers: [AppController],
   providers: [

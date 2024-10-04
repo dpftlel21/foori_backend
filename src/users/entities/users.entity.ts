@@ -5,6 +5,7 @@ import { ReviewEntity } from '../../reviews/entities/review.entity';
 import { BookingEntity } from '../../booking/entities/booking.entity';
 import { LikeEntity } from '../../common/entities/like.entity';
 import { FavoritesEntity } from '../../common/entities/favorites.entity';
+import { SocialAccountsEntity } from './social-accounts.entity';
 
 @Exclude({ toPlainOnly: true })
 @Entity('users', { schema: 'foori' })
@@ -70,4 +71,7 @@ export class UsersEntity extends BaseModel {
 
   @OneToMany(() => FavoritesEntity, (favorites) => favorites.user)
   favorites: FavoritesEntity[];
+
+  @OneToMany(() => SocialAccountsEntity, (socialAccount) => socialAccount.user)
+  socialAccounts: SocialAccountsEntity[];
 }
