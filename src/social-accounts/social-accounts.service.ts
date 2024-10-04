@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SocialAccountsEntity } from '../users/entities/social-accounts.entity';
 import { Repository } from 'typeorm';
 import { CreateSocialAccountLinkRequestDto } from './dto/create-social-account-link-request.dto';
+import { SocialProvider } from './enum/social-provider';
 
 @Injectable()
 export class SocialAccountsService {
@@ -51,7 +52,29 @@ export class SocialAccountsService {
 
       return findSocialAccount;
     } catch (error) {
-      console.error('일치하는 정보가 없습니다.');
+      console.error(
+        '소셜 계정이 연동되지 않았습니다. 일반 로그인 후 소셜 계정을 연동해 주세요.',
+      );
+    }
+  }
+
+  async findUserIdBySocialIdAndProvider(
+    socialId: string,
+    provider: SocialProvider,
+  ): Promise<number> {
+    try {
+      const socialAccount = await this.socialAccountsRepository.findOneOrFail({
+        where: {
+          socialId,
+          provider,
+        },
+      });
+
+      return socialAccount.userId;
+    } catch (error) {
+      console.error(
+        '소셜 계정이 연동되지 않았습니다. 일반 로그인 후 소셜 계정을 연동해 주세요.',
+      );
     }
   }
 }

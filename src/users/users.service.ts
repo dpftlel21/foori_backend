@@ -85,6 +85,24 @@ export class UsersService {
   }
 
   /**
+   * ID로 회원을 찾는 함수
+   * @param id
+   */
+  async findUserById(id: number) {
+    try {
+      const findUser = await this.usersRepository.findOneOrFail({
+        where: {
+          id,
+        },
+      });
+
+      return findUser;
+    } catch (error) {
+      throw new BadRequestException('일치하는 정보가 없습니다.');
+    }
+  }
+
+  /**
    * 회원 가입 시 중복된 정보를 확인하는 함수
    * @param user
    */

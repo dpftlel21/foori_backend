@@ -5,9 +5,9 @@ export class CreateSocialAccountLinkRequestDto {
   @IsNumber()
   userId: number;
 
-  @IsEnum(SocialProvider)
-  provider: SocialProvider;
-
   @IsString()
   socialId: string;
+
+  @IsEnum(SocialProvider)
+  provider: SocialProvider;
 }

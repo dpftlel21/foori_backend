@@ -38,7 +38,9 @@ export class SocialAccountsEntity {
   })
   userId: number;
 
-  @ManyToOne(() => UsersEntity, (user) => user.socialAccounts)
-  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => UsersEntity, (user) => user.reviews, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
   user: UsersEntity;
 }

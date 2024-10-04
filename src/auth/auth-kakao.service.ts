@@ -1,10 +1,15 @@
 import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import axios from 'axios';
 import { AuthService } from './auth.service';
 import { SocialAccountsService } from '../social-accounts/social-accounts.service';
 import { SocialProvider } from '../social-accounts/enum/social-provider';
+import { EntityNotFoundError } from 'typeorm';
 
 @Injectable()
 export class AuthKakaoService {
@@ -58,7 +63,6 @@ export class AuthKakaoService {
         },
       );
 
-      console.log(`Access Token Response: ${response.data}`);
       return response.data.access_token; // 액세스 토큰 반환
     } catch (error) {
       console.error(
@@ -81,7 +85,6 @@ export class AuthKakaoService {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log(`userInfoResponse: ${userInfoResponse.data}`);
     return userInfoResponse.data;
   }
 
@@ -90,17 +93,33 @@ export class AuthKakaoService {
    * @param kakaoUserInfo
    */
   async loginWithKakao(kakaoUserInfo: any) {
-    const email = kakaoUserInfo.kakao_account.email;
-    console.log(`email: ${email}`);
+    const socialId = kakaoUserInfo.id;
+    console.log(`email: ${socialId}`);
+    const findUserId =
+      await this.socialAccountsService.findUserIdBySocialIdAndProvider(
+        socialId,
+        SocialProvider.KAKAO,
+      );
 
-    const findUser = await this.usersService.findUserByEmail(email);
+    const findUserSocialAccount =
+      await this.socialAccountsService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
+        {
+          userId: findUserId,
+          socialId,
+          provider: SocialProvider.KAKAO,
+        },
+      );
 
-    if (!findUser) {
+    if (!findUserSocialAccount) {
       // 에러를 던져서 소셜 계정 연동이 필요함을 알림
       throw new UnauthorizedException(
         '소셜 계정이 연동되지 않았습니다. 일반 로그인 후 소셜 계정을 연동해 주세요.',
       );
     }
+
+    const findUser = await this.usersService.findUserById(
+      findUserSocialAccount.userId,
+    );
 
     return this.authService.loginUser(findUser);
   }
@@ -111,27 +130,37 @@ export class AuthKakaoService {
    * @param kakaoUserInfo
    */
   async linkKakaoAccount(userId: number, kakaoUserInfo: any) {
-    const socialId = kakaoUserInfo.kakao_account.id;
+    const socialId = kakaoUserInfo.id;
     console.log(`social ID: ${socialId}`);
-    const findUser =
-      await this.socialAccountsService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
-        {
-          userId,
-          socialId,
-          provider: SocialProvider.KAKAO,
-        },
-      );
+    try {
+      const findUser =
+        await this.socialAccountsService.verifyExistSocialAccountBySocialIdAndUserIdAndProvicer(
+          {
+            userId,
+            socialId,
+            provider: SocialProvider.KAKAO,
+          },
+        );
 
-    if (findUser) {
-      throw new UnauthorizedException('이미 연동된 소셜 계정 입니다.');
+      if (findUser) {
+        throw new UnauthorizedException('이미 연동된 소셜 계정 입니다.');
+      }
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        console.log('연동되지 않은 카카오 계정입니다. 연동을 진행합니다.');
+        const savedSocialLinkInfo =
+          this.socialAccountsService.createSocialAccount({
+            userId,
+            socialId,
+            provider: SocialProvider.KAKAO,
+          });
+
+        return savedSocialLinkInfo;
+      } else {
+        throw new InternalServerErrorException(
+          '소셜 계정 연동 중 오류가 발생했습니다.',
+        );
+      }
     }
-
-    const savedSocialLinkInfo = this.socialAccountsService.createSocialAccount({
-      userId,
-      socialId,
-      provider: SocialProvider.KAKAO,
-    });
-
-    return savedSocialLinkInfo;
   }
 }
