@@ -5,7 +5,7 @@ import { PostUserInfoForSignTokenRequestDto } from './dto/post-user-info-for-sig
 import { LoginUserRequestDto } from './dto/login-user-request.dto';
 import { RegisterUserRequestDto } from '../users/dto/register-user-request.dto';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class AuthService {

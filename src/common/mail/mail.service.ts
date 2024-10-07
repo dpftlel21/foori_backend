@@ -10,7 +10,6 @@ export class MailService {
     private readonly cacheService: CacheService,
     private readonly configService: ConfigService,
   ) {
-    console.log('hi');
     console.log('Connecting to Redis:', {
       host: process.env.REDIS_HOST,
       port: process.env.REDIS_PORT,
@@ -23,7 +22,6 @@ export class MailService {
   async sendVerificationEmail(to: string) {
     const verificationCode = await this.generateVerificationTokenCode();
     await this.verifyGenerateTokenCode(verificationCode);
-
     //ConfigService를 사용해 환경 변수 불러오기
     const expiresIn = this.configService.get<number>('REDIS_MAIL_EXPIRES_IN');
 

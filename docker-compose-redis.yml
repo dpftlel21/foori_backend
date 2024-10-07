@@ -1,15 +1,22 @@
-services:
-  redis:
-    image: redis:7.4.0
-    restart: always
-    ports:
-      - 6379:6379
-    volumes:
-      - redis-data:/data
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_DB=${REDIS_DB}
-    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes" ]
-
-volumes:
-  redis-data:
+#version: '3'
+#services:
+#  redis:
+#    image: redis:7.4.0
+#    restart: always
+#    ports:
+#      - 6379:6379
+#    volumes:
+#      - redis-data:/data
+#    environment:
+#      REDIS_PASSWORD: ${REDIS_PASSWORD}
+#      REDIS_DB: ${REDIS_DB}
+#    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}", "--appendonly", "yes" ]
+#    networks:
+#      - app-network
+#
+#volumes:
+#  redis-data:
+#
+#networks:
+#  app-network:
+#    external: true

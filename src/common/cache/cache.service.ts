@@ -1,10 +1,10 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager'; // Cache Manager를 주입
+import { Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 
 @Injectable()
 export class CacheService {
   constructor(
-    @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore, // Cache Manager 주입
+    @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore,
   ) {}
 
   async redisSet(key: string, value: string, expire: number) {
@@ -18,5 +18,6 @@ export class CacheService {
 
   async redisDel(key: string) {
     await this.cacheManager.del(key);
+    console.log(`Redis delete: ${key}`);
   }
 }

@@ -11,7 +11,7 @@ import { CacheController } from './cache.controller';
   imports: [
     NestCacheModule.registerAsync({
       useFactory: async (): Promise<CacheModuleOptions> => ({
-        store: redisStore.toString(), // Redis 스토어를 명시적으로 지정
+        store: redisStore,
         host: process.env.REDIS_HOST,
         port: parseInt(process.env.REDIS_PORT, 10),
         password: process.env.REDIS_PASSWORD,

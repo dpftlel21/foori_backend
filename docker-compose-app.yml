@@ -1,0 +1,27 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3001:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: ${FOORI_MYSQL_USER}
+      DB_PASSWORD: ${FOORI_MYSQL_PASSWORD}
+      DB_NAME: ${FOORI_MYSQL_DATABASE}
+    depends_on:
+      - mariadb
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true
