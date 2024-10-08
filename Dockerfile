@@ -4,6 +4,9 @@ FROM node:20-slim
 # 작업 디렉토리 설정
 WORKDIR /app
 
+# 필수 패키지 업데이트 및 curl 설치
+RUN apt-get update && apt-get install -y curl
+
 # 종속성 파일 복사
 COPY package*.json yarn.lock ./
 
