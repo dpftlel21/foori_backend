@@ -6,6 +6,7 @@ import { BookingEntity } from '../../booking/entities/booking.entity';
 import { LikeEntity } from '../../common/entities/like.entity';
 import { FavoritesEntity } from '../../common/entities/favorites.entity';
 import { SocialAccountsEntity } from './social-accounts.entity';
+import * as bcrypt from 'bcryptjs';
 
 @Exclude({ toPlainOnly: true })
 @Entity('users', { schema: 'foori' })
@@ -89,4 +90,8 @@ export class UsersEntity extends BaseModel {
 
   @OneToMany(() => SocialAccountsEntity, (socialAccount) => socialAccount.user)
   socialAccounts: SocialAccountsEntity[];
+
+  async setPassword(newPassword: string, hashRound: number) {
+    this.password = await bcrypt.hash(newPassword, hashRound);
+  }
 }

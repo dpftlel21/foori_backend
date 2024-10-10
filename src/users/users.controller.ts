@@ -16,6 +16,7 @@ import { FindUserPasswordRequestDto } from './dto/find-user-password-request.dto
 import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../common/decorator/user/user.decorator';
+import { UpdateUserPasswordRequestDto } from './dto/update-user-password-request.dto';
 
 @Controller('users')
 export class UsersController {
@@ -54,5 +55,15 @@ export class UsersController {
     @Body() user: UpdateUserRequestDto,
   ) {
     return this.usersService.updateUser(userEmail, user);
+  }
+
+  @Patch('password')
+  @UseGuards(AccessTokenGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  async updateUserPassword(
+    @User('email') userEmail: string,
+    @Body() user: UpdateUserPasswordRequestDto,
+  ) {
+    return this.usersService.updateUserPassword(userEmail, user);
   }
 }

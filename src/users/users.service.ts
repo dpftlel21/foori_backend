@@ -7,12 +7,15 @@ import { FindUserPasswordRequestDto } from './dto/find-user-password-request.dto
 import { FindUserEmailRequestDto } from './dto/find-user-email-request.dto';
 import * as bcrypt from 'bcryptjs';
 import { UpdateUserRequestDto } from './dto/update-user-request.dto';
+import { UpdateUserPasswordRequestDto } from './dto/update-user-password-request.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -116,6 +119,31 @@ export class UsersService {
 
     // 객체 병합 없이 바로 save를 호출할 수 있음
     Object.assign(findUser, user); // 기존 유저 정보에 DTO로 받은 정보 병합
+
+    return await this.usersRepository.save(findUser);
+  }
+
+  /**
+   * 회원 비밀번호 수정 함수
+   * @param userEmail
+   * @param user
+   */
+  async updateUserPassword(
+    userEmail: string,
+    user: UpdateUserPasswordRequestDto,
+  ) {
+    const { currentPassword, newPassword } = user;
+
+    const findUser = await this.findUserByEmail(userEmail);
+
+    await this.verifyPassword(findUser.email, currentPassword);
+
+    const hashRound = parseInt(
+      this.configService.get<string>('HASH_ROUND'),
+      10,
+    );
+
+    await findUser.setPassword(newPassword, hashRound);
 
     return await this.usersRepository.save(findUser);
   }
