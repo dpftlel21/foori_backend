@@ -11,7 +11,7 @@ import { AuthGoogleService } from './auth-google.service';
 @Module({
   imports: [
     JwtModule.register({}),
-    UsersModule,
+    forwardRef(() => UsersModule),
     forwardRef(() => SocialAccountsModule),
   ],
   controllers: [AuthController],

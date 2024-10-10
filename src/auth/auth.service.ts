@@ -167,7 +167,7 @@ export class AuthService {
      */
     const findUser = await this.usersService.findUserByEmail(user.email);
 
-    const passwdOk = bcrypt.compare(user.password, findUser.password);
+    const passwdOk = await bcrypt.compare(user.password, findUser.password);
 
     if (!passwdOk) {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');

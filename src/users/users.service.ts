@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { RegisterUserRequestDto } from './dto/register-user-request.dto';
 import { FindUserPasswordRequestDto } from './dto/find-user-password-request.dto';
 import { FindUserEmailRequestDto } from './dto/find-user-email-request.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -20,8 +21,10 @@ export class UsersService {
   async createUser(user: RegisterUserRequestDto) {
     await this.verifyNonExistUserInfo(user);
 
+    const profileImageUri = await this.createBasicProfileImage(user.name);
     const createdUser = this.usersRepository.create({
       ...user,
+      profileImageUri,
     });
 
     return await this.usersRepository.save(createdUser);
@@ -119,5 +122,28 @@ export class UsersService {
     if (errors.length > 0) {
       throw new BadRequestException(errors.join(', '));
     }
+  }
+
+  /**
+   * 기본 프로필 이미지를 생성하는 함수
+   * @param username
+   */
+  async createBasicProfileImage(username: string) {
+    return `https://api.dicebear.com/9.x/notionists-neutral/svg?seed=${username}`;
+  }
+
+  /**
+   * 비밀번호 확인 함수
+   */
+  async verifyPassword(userEmail: string, password: string) {
+    const findUser = await this.findUserByEmail(userEmail);
+
+    const passwdOk = await bcrypt.compare(password, findUser.password);
+
+    if (!passwdOk) {
+      throw new BadRequestException('비밀번호가 일치하지 않습니다.');
+    }
+
+    return 1;
   }
 }

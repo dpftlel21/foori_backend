@@ -10,7 +10,7 @@ import { UsersModule } from '../users/users.module';
   imports: [
     TypeOrmModule.forFeature([SocialAccountsEntity]),
     forwardRef(() => AuthModule),
-    UsersModule,
+    forwardRef(() => UsersModule),
   ],
   controllers: [SocialAccountsController],
   providers: [SocialAccountsService],
