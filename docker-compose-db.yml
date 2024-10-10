@@ -11,12 +11,12 @@ services:
       MYSQL_DATABASE: ${FOORI_MYSQL_DATABASE}
       MYSQL_USER: ${FOORI_MYSQL_USER}
       MYSQL_PASSWORD: ${FOORI_MYSQL_PASSWORD}
-    networks:
-      - app-network
+#    networks:
+#      - app-network
 
 volumes:
   mariadb-data:
 
-networks:
-  app-network:
-    external: true
+#networks:
+#  app-network:
+#    external: true

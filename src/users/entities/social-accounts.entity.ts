@@ -9,7 +9,7 @@ import {
 import { UsersEntity } from './users.entity';
 import { SocialProvider } from '../../social-accounts/enum/social-provider';
 
-@Entity('social_accounts')
+@Entity('social_accounts', { schema: 'foori' })
 @Unique(['socialId', 'provider']) // provider와 socialId의 복합 유니크 제약
 export class SocialAccountsEntity {
   @PrimaryGeneratedColumn()
