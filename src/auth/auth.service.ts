@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { PostUserInfoForSignTokenRequestDto } from './dto/post-user-info-for-sign-token-request.dto';
@@ -170,7 +174,7 @@ export class AuthService {
     const passwdOk = await bcrypt.compare(user.password, findUser.password);
 
     if (!passwdOk) {
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+      throw new BadRequestException('비밀번호가 일치하지 않습니다.');
     }
 
     return findUser;

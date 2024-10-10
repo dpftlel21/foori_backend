@@ -19,6 +19,7 @@ import { MailModule } from './common/mail/mail.module';
 import { CacheModule } from './common/cache/cache.module';
 import { SocialAccountsModule } from './social-accounts/social-accounts.module';
 import { ImagesModule } from './common/images/images.module';
+import { UploadModule } from './common/upload/upload.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ImagesModule } from './common/images/images.module';
     CacheModule,
     SocialAccountsModule,
     ImagesModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [
