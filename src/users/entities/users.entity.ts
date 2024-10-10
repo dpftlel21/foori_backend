@@ -57,6 +57,22 @@ export class UsersEntity extends BaseModel {
   })
   status: number;
 
+  @Column({
+    name: 'profile_image',
+    type: 'varchar',
+    length: 300,
+    nullable: true,
+  })
+  profileImageUrl: string;
+
+  @Column({
+    name: 'profile_image_key',
+    type: 'varchar',
+    length: 200,
+    nullable: true,
+  })
+  profileImageKey: string;
+
   @Expose()
   createdAt: Date;
 
