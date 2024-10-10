@@ -47,8 +47,12 @@ export class UsersController {
     return await this.usersService.verifyPassword(userEmail, password);
   }
 
-  // @Patch(':id')
-  // async updateUser(@Body() user: UpdateUserRequestDto) {
-  //   return this.usersService.updateUser(user);
-  // }
+  @Patch()
+  @UseGuards(AccessTokenGuard)
+  async updateUser(
+    @User('email') userEmail: string,
+    @Body() user: UpdateUserRequestDto,
+  ) {
+    return this.usersService.updateUser(userEmail, user);
+  }
 }

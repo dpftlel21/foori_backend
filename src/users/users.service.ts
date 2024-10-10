@@ -6,6 +6,7 @@ import { RegisterUserRequestDto } from './dto/register-user-request.dto';
 import { FindUserPasswordRequestDto } from './dto/find-user-password-request.dto';
 import { FindUserEmailRequestDto } from './dto/find-user-email-request.dto';
 import * as bcrypt from 'bcryptjs';
+import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 
 @Injectable()
 export class UsersService {
@@ -103,6 +104,20 @@ export class UsersService {
     } catch (error) {
       throw new BadRequestException('일치하는 정보가 없습니다.');
     }
+  }
+
+  /**
+   * 회원 정보 수정 함수
+   * @param userEmail
+   * @param user
+   */
+  async updateUser(userEmail: string, user: UpdateUserRequestDto) {
+    const findUser = await this.findUserByEmail(userEmail);
+
+    // 객체 병합 없이 바로 save를 호출할 수 있음
+    Object.assign(findUser, user); // 기존 유저 정보에 DTO로 받은 정보 병합
+
+    return await this.usersRepository.save(findUser);
   }
 
   /**
