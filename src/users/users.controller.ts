@@ -20,6 +20,7 @@ import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../common/decorator/user/user.decorator';
 import { UpdateUserPasswordRequestDto } from './dto/update-user-password-request.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UploadFileInterceptor } from '../common/decorator/upload/upload-file-interceptor.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -103,11 +104,7 @@ export class UsersController {
    * @param file
    */
   @Post('profile/upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { fileSize: 1024 * 1024 * 5 },
-    }),
-  )
+  @UploadFileInterceptor()
   @UseGuards(AccessTokenGuard)
   async uploadUserProfileImage(
     @User('email') userEmail: string,
