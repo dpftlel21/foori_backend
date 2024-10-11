@@ -170,6 +170,23 @@ export class UsersService {
   }
 
   /**
+   * 기본 프로필 이미지로 변경하는 함수
+   * @param userEmail
+   */
+  async setBasicProfileImage(userEmail: string) {
+    const findUser = await this.findUserByEmail(userEmail);
+
+    const profileImageUri = await this.createBasicProfileImage(findUser.name);
+
+    Object.assign(findUser, {
+      profileImageUri,
+      profileImageKey: null,
+    });
+
+    return await this.usersRepository.save(findUser);
+  }
+
+  /**
    * 회원 가입 시 중복된 정보를 확인하는 함수
    * @param user
    */

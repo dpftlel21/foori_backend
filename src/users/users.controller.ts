@@ -112,4 +112,14 @@ export class UsersController {
   ) {
     return this.usersService.uploadUserProfileImage(userEmail, file);
   }
+
+  /**
+   * 프로필 이미지 삭제 함수(기본 이미지로 변경)
+   * @param userEmail
+   */
+  @Patch('profile/delete')
+  @UseGuards(AccessTokenGuard)
+  async deleteUserProfileImage(@User('email') userEmail: string) {
+    return this.usersService.setBasicProfileImage(userEmail);
+  }
 }
