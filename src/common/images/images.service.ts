@@ -1,26 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { CreateImageDto } from './dto/create-image.dto';
-import { UpdateImageDto } from './dto/update-image.dto';
+import { UploadService } from '../upload/upload.service';
+import { ImageFolderEnum } from './dto/image-folder.enum';
 
 @Injectable()
 export class ImagesService {
-  create(createImageDto: CreateImageDto) {
-    return 'This action adds a new image';
-  }
+  constructor(private readonly uploadService: UploadService) {}
 
-  findAll() {
-    return `This action returns all images`;
-  }
+  /**
+   * 프로필 이미지 업로드 함수
+   * @param file
+   */
+  async uploadUserProfileImage(file: Express.Multer.File) {
+    const { key, fileUrl } = await this.uploadService.uploadToS3(
+      file,
+      ImageFolderEnum.PROFILE,
+    );
 
-  findOne(id: number) {
-    return `This action returns a #${id} image`;
-  }
-
-  update(id: number, updateImageDto: UpdateImageDto) {
-    return `This action updates a #${id} image`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} image`;
+    return { key, fileUrl };
   }
 }

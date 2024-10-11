@@ -9,12 +9,14 @@ import * as bcrypt from 'bcryptjs';
 import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 import { UpdateUserPasswordRequestDto } from './dto/update-user-password-request.dto';
 import { ConfigService } from '@nestjs/config';
+import { ImagesService } from '../common/images/images.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
+    private readonly imageService: ImagesService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -144,6 +146,25 @@ export class UsersService {
     );
 
     await findUser.setPassword(newPassword, hashRound);
+
+    return await this.usersRepository.save(findUser);
+  }
+
+  /**
+   * 프로필 이미지 업로드 함수
+   * @param userEmail
+   * @param file
+   */
+  async uploadUserProfileImage(userEmail: string, file: Express.Multer.File) {
+    const findUser = await this.findUserByEmail(userEmail);
+
+    const profileImageInfo =
+      await this.imageService.uploadUserProfileImage(file);
+
+    Object.assign(findUser, {
+      profileImageUri: profileImageInfo.fileUrl,
+      profileImageKey: profileImageInfo.key,
+    });
 
     return await this.usersRepository.save(findUser);
   }

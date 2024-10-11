@@ -11,13 +11,13 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class UploadController {
   constructor(private readonly uploadService: UploadService) {}
 
-  @Post()
-  @UseInterceptors(
-    FileInterceptor('file', {
-      limits: { fileSize: 1024 * 1024 * 5 },
-    }),
-  )
-  async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<any> {
-    return await this.uploadService.uploadToS3(file);
-  }
+  // @Post()
+  // @UseInterceptors(
+  //   FileInterceptor('file', {
+  //     limits: { fileSize: 1024 * 1024 * 5 },
+  //   }),
+  // )
+  // async uploadFile(@UploadedFile() file: Express.Multer.File) {
+  //   return await this.uploadService.uploadToS3(file);
+  // }
 }

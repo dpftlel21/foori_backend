@@ -94,4 +94,8 @@ export class UsersEntity extends BaseModel {
   async setPassword(newPassword: string, hashRound: number) {
     this.password = await bcrypt.hash(newPassword, hashRound);
   }
+
+  async setProfileImageUri(newProfileImageUri: string) {
+    this.profileImageUri = newProfileImageUri;
+  }
 }
