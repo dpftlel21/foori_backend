@@ -10,12 +10,13 @@ export class ImagesService {
    * 프로필 이미지 업로드 함수
    * @param file
    */
-  async uploadUserProfileImage(file: Express.Multer.File) {
-    const { key, fileUrl } = await this.uploadService.uploadToS3(
+  async uploadUserProfileImage(id: string, file: Express.Multer.File) {
+    const { userId, key, fileUrl } = await this.uploadService.uploadToS3(
+      id,
       file,
       ImageFolderEnum.PROFILE,
     );
 
-    return { key, fileUrl };
+    return { userId, key, fileUrl };
   }
 }

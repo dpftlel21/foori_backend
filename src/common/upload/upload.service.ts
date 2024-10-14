@@ -1,5 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 import * as sharp from 'sharp';
@@ -29,9 +33,10 @@ export class UploadService {
    * @param folderType
    */
   async uploadToS3(
+    userId: string,
     file: Express.Multer.File,
     folderType: ImageFolderEnum,
-  ): Promise<{ fileUrl: string; key: string }> {
+  ): Promise<{ userId: string; key: string; fileUrl: string }> {
     await this.verifyMimeType(file);
 
     let fileBuffer: Buffer;
@@ -46,27 +51,41 @@ export class UploadService {
       fileName = this.setFileName(file);
     }
 
-    const bucketName = this.configService.get<string>('AWS_BUCKET_NAME');
+    const bucketName = this.getBucket();
+    const key = `${folderType}/${userId}/${fileName}`;
 
-    const params = this.generateS3Params(
-      bucketName,
-      fileName,
-      file,
-      fileBuffer,
-      folderType,
-    );
+    const params = this.generateS3Params(bucketName, key, file, fileBuffer);
 
     // S3에 파일 업로드
     await this.s3Client.send(params);
 
     const bucketRegion = this.configService.get<string>('AWS_REGION');
-    const fileUrl = this.generateS3Uri(
-      bucketName,
-      bucketRegion,
-      `${folderType}/${fileName}`,
-    );
+    const fileUrl = this.generateS3Uri(bucketName, bucketRegion, key);
 
-    return { key: `${folderType}/${fileName}`, fileUrl };
+    return { userId, key, fileUrl };
+  }
+
+  /**
+   * S3에 이미지 파일 삭제
+   * @param oldKey
+   */
+  async deleteFromS3(oldKey: string) {
+    const bucketName = this.getBucket();
+
+    const params = {
+      Bucket: bucketName,
+      Key: oldKey,
+    };
+
+    await this.s3Client.send(new DeleteObjectCommand(params));
+  }
+
+  /**
+   * S3 버킷 이름 가져오기
+   * @private
+   */
+  private getBucket() {
+    return this.configService.get<string>('AWS_BUCKET_NAME');
   }
 
   /**
@@ -83,11 +102,10 @@ export class UploadService {
     key: string,
     file: Express.Multer.File,
     fileBuffer: Buffer,
-    folderType: ImageFolderEnum,
   ) {
     return new PutObjectCommand({
       Bucket: bucketName,
-      Key: `${folderType}/${key}`,
+      Key: key,
       Body: fileBuffer,
       ContentType: file.mimetype,
       CacheControl: 'max-age=2592000', // 한 달(30일)로 설정

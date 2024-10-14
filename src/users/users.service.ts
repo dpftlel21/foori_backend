@@ -10,6 +10,7 @@ import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 import { UpdateUserPasswordRequestDto } from './dto/update-user-password-request.dto';
 import { ConfigService } from '@nestjs/config';
 import { ImagesService } from '../common/images/images.service';
+import { UploadService } from '../common/upload/upload.service';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +18,7 @@ export class UsersService {
     @InjectRepository(UsersEntity)
     private readonly usersRepository: Repository<UsersEntity>,
     private readonly imageService: ImagesService,
+    private readonly uploadService: UploadService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -158,8 +160,10 @@ export class UsersService {
   async uploadUserProfileImage(userEmail: string, file: Express.Multer.File) {
     const findUser = await this.findUserByEmail(userEmail);
 
-    const profileImageInfo =
-      await this.imageService.uploadUserProfileImage(file);
+    const profileImageInfo = await this.imageService.uploadUserProfileImage(
+      findUser.id.toString(),
+      file,
+    );
 
     Object.assign(findUser, {
       profileImageUri: profileImageInfo.fileUrl,
@@ -177,6 +181,8 @@ export class UsersService {
     const findUser = await this.findUserByEmail(userEmail);
 
     const profileImageUri = await this.createBasicProfileImage(findUser.name);
+
+    await this.uploadService.deleteFromS3(findUser.profileImageKey);
 
     Object.assign(findUser, {
       profileImageUri,
