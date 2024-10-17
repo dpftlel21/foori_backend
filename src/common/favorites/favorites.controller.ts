@@ -18,7 +18,7 @@ export class FavoritesController {
   @UseGuards(AccessTokenGuard)
   async toggleFavorite(
     @User('email') userEmail: string,
-    @Param('restaurantId', ParseIntPipe) placeId: number,
+    @Param('placeId', ParseIntPipe) placeId: number,
   ) {
     return this.favoritesService.toggleFavorite(userEmail, placeId);
   }
@@ -27,7 +27,7 @@ export class FavoritesController {
   @UseGuards(AccessTokenGuard)
   async isFavorite(
     @User('email') userEmail: string,
-    @Param('restaurantId', ParseIntPipe) placeId: number,
+    @Param('placeId', ParseIntPipe) placeId: number,
   ) {
     return this.favoritesService.isFavorite(userEmail, placeId);
   }

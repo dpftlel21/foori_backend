@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { MenuEntity } from '../menus/entities/menu.entity';
 import { plainToInstance } from 'class-transformer';
 import { RestaurantInfoResponseDto } from './dto/restaurant-info-response.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PlaceService {
@@ -13,6 +14,7 @@ export class PlaceService {
     private readonly restaurantRepository: Repository<RestaurantEntity>,
     @InjectRepository(MenuEntity)
     private readonly menuRepository: Repository<MenuEntity>,
+    private readonly userService: UsersService,
   ) {}
 
   async findRestaurantById(id: number): Promise<RestaurantInfoResponseDto> {
@@ -28,5 +30,22 @@ export class PlaceService {
     } catch (error) {
       throw new NotFoundException('일치하는 식당 정보가 없습니다.');
     }
+  }
+
+  async findMyPlaceByUserEmail(userEmail: string) {
+    const findUser = await this.userService.findUserByEmail(userEmail);
+
+    return await this.restaurantRepository
+      .createQueryBuilder('restaurant')
+      .leftJoin('restaurant.favorites', 'favorite')
+      .select([
+        'restaurant.name',
+        'restaurant.address',
+        'restaurant.locationNum',
+        'restaurant.postalCode',
+        'restaurant.telNum',
+      ])
+      .where('favorite.userId = :userId', { userId: findUser.id })
+      .getMany();
   }
 }
