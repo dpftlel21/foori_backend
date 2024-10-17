@@ -20,6 +20,7 @@ import { CacheModule } from './common/cache/cache.module';
 import { SocialAccountsModule } from './social-accounts/social-accounts.module';
 import { ImagesModule } from './common/images/images.module';
 import { UploadModule } from './common/upload/upload.module';
+import { MypageModule } from './mypage/mypage.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { UploadModule } from './common/upload/upload.module';
     SocialAccountsModule,
     ImagesModule,
     UploadModule,
+    MypageModule,
   ],
   controllers: [AppController],
   providers: [
