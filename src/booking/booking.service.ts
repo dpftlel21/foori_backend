@@ -65,7 +65,36 @@ export class BookingService {
     savedBooking.totalPrice = totalPrice;
     const responseBooking = await this.bookingRepository.save(savedBooking);
 
-    return responseBooking;
+    // 필요한 필드만 가져오는 방식으로 응답
+    const bookingResponse = await this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoin('booking.user', 'user') // leftJoin 사용
+      .leftJoin('booking.restaurant', 'restaurant') // leftJoin 사용
+      .leftJoin('booking.bookingMenus', 'bookingMenu')
+      .leftJoin('bookingMenu.menu', 'menu')
+      .select([
+        'booking.id',
+        'booking.bookingDate',
+        'booking.bookingTime',
+        'booking.numOfPeople',
+        'booking.totalPrice',
+        'booking.paymentStatus',
+        'booking.status',
+        'booking.isReviewed',
+        'user.name', // 필요한 필드만 선택
+        'restaurant.name',
+        'restaurant.address',
+        'restaurant.locationNum',
+        'restaurant.postalCode',
+        'restaurant.telNum',
+        'bookingMenu.quantity',
+        'menu.name',
+        'menu.price',
+      ])
+      .where('booking.id = :bookingId', { bookingId: responseBooking.id })
+      .getOne();
+
+    return bookingResponse;
   }
 
   async findBookingByUserEmail(userEmail: string) {
