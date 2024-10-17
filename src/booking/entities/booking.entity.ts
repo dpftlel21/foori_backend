@@ -29,9 +29,7 @@ export class BookingEntity extends BaseModel {
 
   @Column({
     name: 'total_price',
-    type: 'decimal',
-    precision: 10,
-    scale: 2,
+    type: 'int',
     comment: '총 결제 금액',
   })
   totalPrice: number;

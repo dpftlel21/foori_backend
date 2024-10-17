@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BookingEntity } from './entities/booking.entity';
 import { Repository } from 'typeorm';
@@ -66,5 +66,49 @@ export class BookingService {
     const responseBooking = await this.bookingRepository.save(savedBooking);
 
     return responseBooking;
+  }
+
+  async findBookingByUserEmail(userEmail: string) {
+    try {
+      const findUser = await this.userService.findUserByEmail(userEmail);
+
+      return await this.bookingRepository
+        .createQueryBuilder('booking')
+        .select([
+          'booking.id',
+          'booking.bookingDate',
+          'booking.bookingTime',
+          'booking.numOfPeople',
+          'booking.totalPrice',
+          'booking.paymentStatus',
+          'booking.status',
+          'booking.isReviewed',
+        ])
+        // Restaurant에서 필요한 필드만 선택
+        .leftJoin('booking.restaurant', 'restaurant')
+        .addSelect([
+          'restaurant.name',
+          'restaurant.address',
+          'restaurant.locationNum',
+          'restaurant.postalCode',
+          'restaurant.telNum',
+        ])
+
+        // BookingMenu 조인 및 menu_id, quantity 선택
+        .leftJoin('booking.bookingMenus', 'bookingMenu')
+        .addSelect(['bookingMenu.quantity'])
+
+        // Menus 테이블에서 menu_name, menu_price 선택
+        .leftJoin('bookingMenu.menu', 'menu')
+        .addSelect(['menu.name', 'menu.price'])
+
+        .where('booking.user_id = :userId', { userId: findUser.id })
+        .getMany();
+    } catch (error) {
+      throw new NotFoundException(
+        '일치하는 예약 정보가 없습니다.',
+        error.message,
+      );
+    }
   }
 }
