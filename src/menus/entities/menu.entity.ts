@@ -15,10 +15,9 @@ export class MenuEntity extends BaseModel {
 
   @Column({
     name: 'menu_price',
-    type: 'varchar',
-    length: 20,
+    type: 'int',
   })
-  price: string;
+  price: number;
 
   @ManyToOne(() => RestaurantEntity, (restaurant) => restaurant.menus, {
     onDelete: 'CASCADE',

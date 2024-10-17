@@ -294,13 +294,18 @@ export class CrawlService {
             (el) => el.textContent.trim(),
           );
 
-          // '가격: '을 제외하고 저장
           const menuPrice = await listItems[i].$eval(
             KAKAO_MAP_SEARCH_RESULT_MENU_PRICE,
-            (el) => el.textContent.trim().replace(/^가격:\s*/, ''),
+            (el) =>
+              el.textContent
+                .trim()
+                .replace(/^가격:\s*/, '')
+                .replace(/,/g, ''), // '가격: ' 제거 및 쉼표 제거
           );
 
-          menus.push({ name: menuName, price: menuPrice });
+          const parsedPrice = parseInt(menuPrice, 10); // 문자열을 정수로 변환
+
+          menus.push({ name: menuName, price: parsedPrice });
         }
       }
 

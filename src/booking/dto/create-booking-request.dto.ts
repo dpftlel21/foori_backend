@@ -1,4 +1,4 @@
-import { RestaurantInfoRequestDto } from '../../place/restaurant-info-request.dto';
+import { RestaurantInfoRequestDto } from '../../place/dto/restaurant-info-request.dto';
 import { CreateBookingMenusRequestDto } from '../../booking-menus/dto/create-booking-menus-request.dto';
 import { IsNumber, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';

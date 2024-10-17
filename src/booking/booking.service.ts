@@ -58,7 +58,7 @@ export class BookingService {
       );
 
       // 메뉴 가격 합산 (단가 * 수량)
-      totalPrice += parseFloat(menu.price.replace(',', '')) * menuDto.quantity;
+      totalPrice += menu.price * menuDto.quantity;
     }
 
     // 5. 예약 총 금액 업데이트

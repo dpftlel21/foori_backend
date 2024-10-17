@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BookingMenuEntity } from './entities/booking-menus.entity';
 import { Repository } from 'typeorm';
 import { BookingEntity } from '../booking/entities/booking.entity';
-import { MenuEntity } from '../menus/entities/menu.entity';
+import { MenusResponseDto } from '../menus/dto/menus-response.dto';
 
 @Injectable()
 export class BookingMenusService {
@@ -14,7 +14,7 @@ export class BookingMenusService {
 
   async createBookingMenu(
     booking: BookingEntity,
-    menu: MenuEntity,
+    menu: MenusResponseDto,
     quantity: number,
   ) {
     const bookingMenu = this.bookingMenuRepository.create({
