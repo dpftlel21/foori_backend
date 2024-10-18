@@ -43,4 +43,11 @@ export class ReviewsService {
       throw new NotFoundException('일치하는 리뷰 정보가 없습니다.');
     }
   }
+
+  async findReviewsByUserEmail(userEmail: string) {
+    const findUser = await this.usersService.findUserByEmail(userEmail);
+    return await this.reviewRepository.find({
+      where: { userId: findUser.id },
+    });
+  }
 }
