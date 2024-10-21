@@ -8,6 +8,7 @@ import { RestaurantEntity } from '../place/entities/restaurant.entity';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { PlaceModule } from '../place/place.module';
+import { BookingModule } from '../booking/booking.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { PlaceModule } from '../place/place.module';
     UsersModule,
     AuthModule,
     PlaceModule,
+    BookingModule,
   ],
   controllers: [ReviewsController],
   providers: [ReviewsService],

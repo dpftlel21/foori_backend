@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { MypageService } from './mypage.service';
 import { BookingService } from '../booking/booking.service';
 import { User } from '../common/decorator/user/user.decorator';
@@ -15,9 +15,18 @@ export class MypageController {
     private readonly reviewService: ReviewsService,
   ) {}
 
-  @Get('my-booking')
+  @Get('my-booking/:bookingId')
   @UseGuards(AccessTokenGuard)
-  async getMyBooking(@User('email') userEmail: string) {
+  async getMyBooking(
+    @User('email') userEmail: string,
+    @Param('bookingId') bookingId: number,
+  ) {
+    return this.bookingService.findBookingById(userEmail, bookingId);
+  }
+
+  @Get('my-bookings')
+  @UseGuards(AccessTokenGuard)
+  async getMyBookings(@User('email') userEmail: string) {
     return this.bookingService.findBookingByUserEmail(userEmail);
   }
 
@@ -27,9 +36,9 @@ export class MypageController {
     return this.placeService.findMyPlaceByUserEmail(userEmail);
   }
 
-  @Get('my-review')
+  @Get('my-reviews')
   @UseGuards(AccessTokenGuard)
-  async getMyReview(@User('email') userEmail: string) {
+  async getMyReviews(@User('email') userEmail: string) {
     return this.reviewService.findReviewsByUserEmail(userEmail);
   }
 }

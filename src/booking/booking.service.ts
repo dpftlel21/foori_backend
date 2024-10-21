@@ -68,8 +68,8 @@ export class BookingService {
     // 필요한 필드만 가져오는 방식으로 응답
     const bookingResponse = await this.bookingRepository
       .createQueryBuilder('booking')
-      .leftJoin('booking.user', 'user') // leftJoin 사용
-      .leftJoin('booking.restaurant', 'restaurant') // leftJoin 사용
+      .leftJoin('booking.user', 'user')
+      .leftJoin('booking.restaurant', 'restaurant')
       .leftJoin('booking.bookingMenus', 'bookingMenu')
       .leftJoin('bookingMenu.menu', 'menu')
       .select([
@@ -81,7 +81,7 @@ export class BookingService {
         'booking.paymentStatus',
         'booking.status',
         'booking.isReviewed',
-        'user.name', // 필요한 필드만 선택
+        'user.name',
         'restaurant.name',
         'restaurant.address',
         'restaurant.locationNum',
@@ -133,6 +133,70 @@ export class BookingService {
 
         .where('booking.user_id = :userId', { userId: findUser.id })
         .getMany();
+    } catch (error) {
+      throw new NotFoundException(
+        '일치하는 예약 정보가 없습니다.',
+        error.message,
+      );
+    }
+  }
+
+  async findBookingById(userEmail: string, bookingId: number) {
+    try {
+      const findUser = await this.userService.findUserByEmail(userEmail);
+
+      return (
+        this.bookingRepository
+          .createQueryBuilder('booking')
+          .select([
+            'booking.id',
+            'booking.bookingDate',
+            'booking.bookingTime',
+            'booking.numOfPeople',
+            'booking.totalPrice',
+            'booking.paymentStatus',
+            'booking.status',
+            'booking.isReviewed',
+          ])
+          // Restaurant에서 필요한 필드만 선택
+          .leftJoin('booking.restaurant', 'restaurant')
+          .addSelect([
+            'restaurant.id',
+            'restaurant.name',
+            'restaurant.address',
+            'restaurant.locationNum',
+            'restaurant.postalCode',
+            'restaurant.telNum',
+          ])
+
+          // BookingMenu 조인 및 menu_id, quantity 선택
+          .leftJoin('booking.bookingMenus', 'bookingMenu')
+          .addSelect(['bookingMenu.quantity'])
+
+          // Menus 테이블에서 menu_name, menu_price 선택
+          .leftJoin('bookingMenu.menu', 'menu')
+          .addSelect(['menu.name', 'menu.price'])
+
+          .where('booking.user_id = :userId', { userId: findUser.id })
+          .andWhere('booking.id = :bookingId', { bookingId })
+          .getOne()
+      );
+    } catch (error) {
+      throw new NotFoundException(
+        '일치하는 예약 정보가 없습니다.',
+        error.message,
+      );
+    }
+  }
+
+  async updateBookingReviewedStatus(bookingId: number) {
+    try {
+      const findBooking = await this.bookingRepository.findOneOrFail({
+        where: { id: bookingId },
+      });
+
+      Object.assign(findBooking, { isReviewed: 1 });
+      await this.bookingRepository.save(findBooking);
     } catch (error) {
       throw new NotFoundException(
         '일치하는 예약 정보가 없습니다.',

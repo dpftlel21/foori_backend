@@ -16,7 +16,9 @@ export class ReviewEntity extends BaseModel {
 
   @Column({
     name: 'rating',
-    type: 'int',
+    type: 'decimal',
+    precision: 2, // 전체 자릿수
+    scale: 1, // 소수점 이하 자릿수
     comment: '평점',
   })
   rating: number;
