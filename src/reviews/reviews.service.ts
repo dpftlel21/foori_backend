@@ -110,9 +110,8 @@ export class ReviewsService {
    * 해당 유저의 리뷰 수 조회 함수
    * @param userEmail
    */
-  async countReviewsByUserEmail(userEmail: string) {
+  async operReviewsByUserEmail(userEmail: string) {
     const findUser = await this.usersService.findUserByEmail(userEmail);
-    console.log(`findUser.id: ${findUser.id}`);
     return await this.reviewRepository.count({
       where: { userId: findUser.id },
     });

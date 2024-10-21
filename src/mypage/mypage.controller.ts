@@ -54,10 +54,9 @@ export class MypageController {
     return this.reviewService.findReviewById(reviewId);
   }
 
-  @Get('my-review/count')
+  @Get('my-review-count')
   @UseGuards(AccessTokenGuard)
-  async getMyReviewCount(@User('email') userEmail: string) {
-    console.log('userEmail:', userEmail);
-    return this.reviewService.countReviewsByUserEmail(userEmail);
+  async getMyReviewOper(@User('email') userEmail: string) {
+    return this.reviewService.operReviewsByUserEmail(userEmail);
   }
 }
