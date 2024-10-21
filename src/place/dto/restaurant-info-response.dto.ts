@@ -58,7 +58,7 @@ export class RestaurantInfoResponseDto {
 
   @IsNumber()
   @Expose()
-  rating: number;
+  ratingAvg: number;
 
   @Expose()
   @ValidateNested({ each: true }) // 배열 내부의 각 객체를 검증

@@ -27,6 +27,6 @@ export class PlaceController {
 
   @Get(':restaurantId/reviews-count')
   async getRestaurantReviews(@Param('restaurantId', ParseIntPipe) id: number) {
-    return this.reviewService.countReviewsByRestaurantId(id);
+    return this.reviewService.operReviewsByRestaurantId(id);
   }
 }

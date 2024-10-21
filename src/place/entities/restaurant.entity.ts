@@ -75,6 +75,24 @@ export class RestaurantEntity extends BaseModel {
   })
   telNum: string;
 
+  @Column({
+    name: 'review_count',
+    type: 'int',
+    default: 0,
+    comment: '리뷰 수',
+  })
+  reviewCount: number;
+
+  @Column({
+    name: 'rating_avg',
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    default: 0,
+    comment: '평균 평점',
+  })
+  ratingAvg: number;
+
   @OneToMany(() => MenuEntity, (menu) => menu.restaurant, { cascade: true })
   menus: MenuEntity[];
 

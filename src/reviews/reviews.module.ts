@@ -11,10 +11,10 @@ import { PlaceModule } from '../place/place.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([ReviewEntity]),
-    forwardRef(() => PlaceModule),
-    forwardRef(() => BookingModule),
     UsersModule,
     AuthModule,
+    forwardRef(() => PlaceModule),
+    forwardRef(() => BookingModule),
   ],
   controllers: [ReviewsController],
   providers: [ReviewsService],

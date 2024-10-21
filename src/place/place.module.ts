@@ -3,14 +3,13 @@ import { PlaceService } from './place.service';
 import { PlaceController } from './place.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RestaurantEntity } from './entities/restaurant.entity';
-import { MenuEntity } from '../menus/entities/menu.entity';
 import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { ReviewsModule } from '../reviews/reviews.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([RestaurantEntity, MenuEntity]),
+    TypeOrmModule.forFeature([RestaurantEntity]),
     AuthModule,
     UsersModule,
     forwardRef(() => ReviewsModule),

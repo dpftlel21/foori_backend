@@ -50,6 +50,7 @@ export class ReviewsService {
 
       const savedReview = await this.reviewRepository.save(createdReview);
 
+      await this.placeService.updateRestaurantReviewStats(findRestaurant.id);
       await this.bookingService.updateBookingReviewedStatus(findBooking.id);
 
       return savedReview;
@@ -118,12 +119,25 @@ export class ReviewsService {
   }
 
   /**
-   * 해당 식당의 리뷰 수 조회 함수
+   * 해당 식당의 리뷰 수 및 평균평점 조회 함수
    * @param restaurantId
    */
-  async countReviewsByRestaurantId(restaurantId: number) {
-    return await this.reviewRepository.count({
+  async operReviewsByRestaurantId(restaurantId: number) {
+    const reviewCount = await this.reviewRepository.count({
       where: { restaurantId },
     });
+
+    const averageRatingResult = await this.reviewRepository
+      .createQueryBuilder('review')
+      .select('AVG(review.rating)', 'averageRating')
+      .where('review.restaurantId = :restaurantId', { restaurantId })
+      .getRawOne();
+
+    const averageRating = averageRatingResult?.averageRating || 0; // 평점이 없으면 0으로 반환
+
+    return {
+      reviewCount,
+      averageRating,
+    };
   }
 }
