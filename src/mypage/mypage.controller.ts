@@ -5,6 +5,7 @@ import { User } from '../common/decorator/user/user.decorator';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { PlaceService } from '../place/place.service';
 import { ReviewsService } from '../reviews/reviews.service';
+import { UsersService } from '../users/users.service';
 
 @Controller('mypage')
 export class MypageController {
@@ -13,6 +14,7 @@ export class MypageController {
     private readonly bookingService: BookingService,
     private readonly placeService: PlaceService,
     private readonly reviewService: ReviewsService,
+    private readonly userService: UsersService,
   ) {}
 
   @Get('my-booking/:bookingId')
@@ -24,7 +26,7 @@ export class MypageController {
     return this.bookingService.findBookingById(userEmail, bookingId);
   }
 
-  @Get('my-bookings')
+  @Get('my-booking')
   @UseGuards(AccessTokenGuard)
   async getMyBookings(@User('email') userEmail: string) {
     return this.bookingService.findBookingByUserEmail(userEmail);
@@ -36,9 +38,19 @@ export class MypageController {
     return this.placeService.findMyPlaceByUserEmail(userEmail);
   }
 
-  @Get('my-reviews')
+  @Get('my-review')
   @UseGuards(AccessTokenGuard)
   async getMyReviews(@User('email') userEmail: string) {
     return this.reviewService.findReviewsByUserEmail(userEmail);
+  }
+
+  @Get('my-review/:reviewId')
+  @UseGuards(AccessTokenGuard)
+  async getMyReview(
+    @User('email') userEmail: string,
+    @Param('reviewId') reviewId: number,
+  ) {
+    this.userService.findUserByEmail(userEmail);
+    return this.reviewService.findReviewById(reviewId);
   }
 }
