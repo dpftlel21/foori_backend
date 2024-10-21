@@ -18,6 +18,11 @@ export class ReviewsService {
     private readonly bookingService: BookingService,
   ) {}
 
+  /**
+   * 리뷰 작성 함수
+   * @param userEmail
+   * @param createReviewRequestDto
+   */
   async createReview(
     userEmail: string,
     createReviewRequestDto: CreateReviewRequestDto,
@@ -53,6 +58,11 @@ export class ReviewsService {
     }
   }
 
+  /**
+   * 리뷰 작성 가능 여부 확인 함수
+   * @param findBooking
+   * @private
+   */
   private verifyPossiblePostReview(findBooking: BookingEntity) {
     if (
       findBooking.bookingTime > new Date() ||
@@ -68,6 +78,10 @@ export class ReviewsService {
     }
   }
 
+  /**
+   * 리뷰 상세조회 함수
+   * @param reviewId
+   */
   async findReviewById(reviewId: number) {
     try {
       const findReview = await this.reviewRepository.findOneOrFail({
@@ -80,6 +94,10 @@ export class ReviewsService {
     }
   }
 
+  /**
+   * 해당 유저의 리뷰 리스트 조회 함수
+   * @param userEmail
+   */
   async findReviewsByUserEmail(userEmail: string) {
     const findUser = await this.usersService.findUserByEmail(userEmail);
     return await this.reviewRepository.find({

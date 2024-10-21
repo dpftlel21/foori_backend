@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BookingEntity } from './entities/booking.entity';
 import { Repository } from 'typeorm';
@@ -28,6 +32,8 @@ export class BookingService {
     const findRestaurant = await this.placeService.findRestaurantById(
       createRequestDto.restaurant.restaurantId,
     );
+
+    await this.verifyPossibleBooking(createRequestDto);
 
     const createdBooking = this.bookingRepository.create({
       bookingDate: new Date(createRequestDto.bookingDate),
@@ -95,6 +101,18 @@ export class BookingService {
       .getOne();
 
     return bookingResponse;
+  }
+
+  private async verifyPossibleBooking(
+    createRequestDto: CreateBookingRequestDto,
+  ) {
+    const threeHoursLater = new Date(new Date().getTime() + 3 * 60 * 60 * 1000);
+
+    if (createRequestDto.bookingTime < threeHoursLater) {
+      throw new BadRequestException(
+        '현재 시간보다 3시간 이후의 예약만 가능합니다.',
+      );
+    }
   }
 
   async findBookingByUserEmail(userEmail: string) {

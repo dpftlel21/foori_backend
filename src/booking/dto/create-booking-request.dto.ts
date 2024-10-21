@@ -1,13 +1,15 @@
 import { RestaurantInfoRequestDto } from '../../place/dto/restaurant-info-request.dto';
 import { CreateBookingMenusRequestDto } from '../../booking-menus/dto/create-booking-menus-request.dto';
-import { IsNumber, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsDate, IsNumber, ValidateNested } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateBookingRequestDto {
-  @IsString()
-  bookingDate: string;
-  @IsString()
-  bookingTime: string;
+  @Transform(({ value }) => new Date(`${value}T00:00:00`))
+  @IsDate()
+  bookingDate: Date;
+  @Transform(({ obj }) => new Date(`${obj.bookingDate}T${obj.bookingTime}`))
+  @IsDate()
+  bookingTime: Date;
   @IsNumber()
   numOfPeople: number;
   @ValidateNested() // 객체 타입을 기대
