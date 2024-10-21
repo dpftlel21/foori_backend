@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { BookingController } from './booking.controller';
 import { BookingMenusService } from '../booking-menus/booking-menus.service';
@@ -15,7 +15,7 @@ import { MenusModule } from '../menus/menus.module';
     TypeOrmModule.forFeature([BookingEntity, BookingMenuEntity]),
     AuthModule,
     UsersModule,
-    PlaceModule,
+    forwardRef(() => PlaceModule),
     MenusModule,
   ],
   controllers: [BookingController],

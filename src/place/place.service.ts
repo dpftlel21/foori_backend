@@ -6,6 +6,7 @@ import { MenuEntity } from '../menus/entities/menu.entity';
 import { plainToInstance } from 'class-transformer';
 import { RestaurantInfoResponseDto } from './dto/restaurant-info-response.dto';
 import { UsersService } from '../users/users.service';
+import { ReviewsService } from '../reviews/reviews.service';
 
 @Injectable()
 export class PlaceService {
@@ -13,7 +14,6 @@ export class PlaceService {
     @InjectRepository(RestaurantEntity)
     private readonly restaurantRepository: Repository<RestaurantEntity>,
     @InjectRepository(MenuEntity)
-    private readonly menuRepository: Repository<MenuEntity>,
     private readonly userService: UsersService,
   ) {}
 
@@ -21,12 +21,23 @@ export class PlaceService {
     try {
       const findRestaurant = await this.restaurantRepository.findOneOrFail({
         where: { id },
-        relations: ['menus'],
+        relations: ['menus', 'reviews'],
       });
 
-      return plainToInstance(RestaurantInfoResponseDto, findRestaurant, {
-        excludeExtraneousValues: true,
-      });
+      const reviewCount = findRestaurant.reviews
+        ? findRestaurant.reviews.length
+        : 0;
+
+      return plainToInstance(
+        RestaurantInfoResponseDto,
+        {
+          ...findRestaurant,
+          reviewCount,
+        },
+        {
+          excludeExtraneousValues: true,
+        },
+      );
     } catch (error) {
       throw new NotFoundException('일치하는 식당 정보가 없습니다.');
     }
