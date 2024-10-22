@@ -11,6 +11,7 @@ import { UpdateUserPasswordRequestDto } from './dto/update-user-password-request
 import { ConfigService } from '@nestjs/config';
 import { ImagesService } from '../common/images/images.service';
 import { UploadService } from '../common/upload/upload.service';
+import { UserLogsService } from '../user-logs/user-logs.service';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
     private readonly usersRepository: Repository<UsersEntity>,
     private readonly imageService: ImagesService,
     private readonly uploadService: UploadService,
+    private readonly userLogsService: UserLogsService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -148,6 +150,8 @@ export class UsersService {
     );
 
     await findUser.setPassword(newPassword, hashRound);
+
+    await this.userLogsService.updateUserLogsByChangePassword(userEmail);
 
     return await this.usersRepository.save(findUser);
   }
