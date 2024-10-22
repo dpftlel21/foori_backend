@@ -233,4 +233,33 @@ export class UsersService {
 
     return 1;
   }
+
+  /**
+   * 회원 탈퇴 함수
+   * @param userEmail
+   */
+  async withDrawUser(userEmail: string) {
+    const findUser = await this.findUserByEmail(userEmail);
+
+    Object.assign(findUser, { status: 9 });
+
+    return await this.usersRepository.save(findUser);
+  }
+
+  /**
+   * 회원 삭제 함수
+   * @param userEmail
+   */
+  async deleteUser(userEmail: string) {
+    const findUser = await this.findUserByEmail(userEmail);
+
+    return await this.usersRepository.remove(findUser);
+  }
+
+  /**
+   * 회원 리스트 조회 함수(테스트용)
+   */
+  // async findAllUsers() {
+  //   return await this.usersRepository.find();
+  // }
 }

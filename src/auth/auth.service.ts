@@ -10,12 +10,14 @@ import { LoginUserRequestDto } from './dto/login-user-request.dto';
 import { RegisterUserRequestDto } from '../users/dto/register-user-request.dto';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
+import { UserLogsService } from '../user-logs/user-logs.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly usersService: UsersService,
+    private readonly userLogsService: UserLogsService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -38,6 +40,8 @@ export class AuthService {
       password: hashPassword,
     });
 
+    await this.userLogsService.createUserLogs(createdUser.email);
+
     return this.loginUser(createdUser);
   }
 
@@ -56,6 +60,8 @@ export class AuthService {
    * @param user
    */
   async loginUser(user: PostUserInfoForSignTokenRequestDto) {
+    await this.userLogsService.findUserLogsByUserEmail(user.email);
+    await this.userLogsService.updateUserLogsByLogin(user.email);
     return {
       accessToken: this.signToken(user, false),
       refreshToken: this.signToken(user, true),

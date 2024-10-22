@@ -7,12 +7,14 @@ import { AuthKakaoService } from './auth-kakao.service';
 import { SocialAccountsModule } from '../social-accounts/social-accounts.module';
 import { AuthNaverService } from './auth-naver.service';
 import { AuthGoogleService } from './auth-google.service';
+import { UserLogsModule } from '../user-logs/user-logs.module';
 
 @Module({
   imports: [
     JwtModule.register({}),
     forwardRef(() => UsersModule),
     forwardRef(() => SocialAccountsModule),
+    forwardRef(() => UserLogsModule),
   ],
   controllers: [AuthController],
   providers: [

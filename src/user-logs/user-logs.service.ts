@@ -36,7 +36,7 @@ export class UserLogsService {
    * 사용자 로그 정보 갱신 함수(로그인 시)
    * @param userEmail
    */
-  async updateUserLogs(userEmail: string) {
+  async updateUserLogsByLogin(userEmail: string) {
     const findUser = await this.userService.findUserByEmail(userEmail);
 
     const now = new Date();
@@ -80,7 +80,7 @@ export class UserLogsService {
    * 사용자 로그 정보 조회 함수
    * @param userEmail
    */
-  async findUserLogsByUserId(userEmail: string) {
+  async findUserLogsByUserEmail(userEmail: string) {
     try {
       const findUser = await this.userService.findUserByEmail(userEmail);
       return await this.userLogsRepository.findOneOrFail({
