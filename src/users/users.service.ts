@@ -261,6 +261,34 @@ export class UsersService {
   }
 
   /**
+   * 휴면 계정 전환 함수
+   * @param userId
+   */
+  async updateUserStatusToDormant(userId: number) {
+    const findUser = await this.findUserById(userId);
+
+    Object.assign(findUser, { status: 4 });
+
+    return await this.usersRepository.save(findUser);
+  }
+
+  /**
+   * 비밀번호 변경 알림 함수
+   */
+  async sendPasswordChangeNotification(userId: number) {
+    const findUser = await this.findUserById(userId);
+
+    // 비밀번호 변경 알림 메일 발송
+    console.log(`${findUser.email}님의 비밀번호 변경 알림 메일 발송`);
+
+    return {
+      email: findUser.email,
+      name: findUser.name,
+      message: '비밀번호 변경 알림 메일 발송 완료',
+    };
+  }
+
+  /**
    * 회원 리스트 조회 함수(테스트용)
    */
   // async findAllUsers() {

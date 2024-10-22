@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserLogsEntity } from '../users/entities/user-logs.entity';
-import { Repository } from 'typeorm';
+import { LessThanOrEqual, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -107,5 +107,25 @@ export class UserLogsService {
     const result = new Date(date);
     result.setDate(result.getDate() + days);
     return result;
+  }
+
+  /**
+   * 사용자 휴면 전환 로그 정보 전체 조회 함수(스케줄링 및 관리자용)
+   */
+  async findAllUserLogsForDormantCheck() {
+    const now = new Date();
+    return await this.userLogsRepository.find({
+      where: { nextDormantCheckDate: LessThanOrEqual(now) },
+    });
+  }
+
+  /**
+   * 사용자 비밀번호 변경 알림 로그 정보 전체 조회 함수(스케줄링 및 관리자용)
+   */
+  async findAllUserLogsForPasswordChangeNotification() {
+    const now = new Date();
+    return await this.userLogsRepository.find({
+      where: { nextNotificationDate: LessThanOrEqual(now) },
+    });
   }
 }
