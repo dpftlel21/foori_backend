@@ -21,6 +21,7 @@ import { SocialAccountsModule } from './social-accounts/social-accounts.module';
 import { ImagesModule } from './common/images/images.module';
 import { UploadModule } from './common/upload/upload.module';
 import { MypageModule } from './mypage/mypage.module';
+import { ScheduleModule } from './common/schedule/schedule.module';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { MypageModule } from './mypage/mypage.module';
     ImagesModule,
     UploadModule,
     MypageModule,
+    ScheduleModule,
   ],
   controllers: [AppController],
   providers: [
