@@ -12,6 +12,7 @@ export class ScheduleService {
 
   /**
    * 매월 오전 3시 휴면 계정 전환 처리 함수
+   * 분, 시, 일, 월, 요일
    */
   @Cron('0 3 1 * *')
   async checkDormantAccounts() {
