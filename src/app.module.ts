@@ -1,4 +1,9 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -22,6 +27,7 @@ import { ImagesModule } from './common/images/images.module';
 import { UploadModule } from './common/upload/upload.module';
 import { MypageModule } from './mypage/mypage.module';
 import { ScheduleModule } from './common/schedule/schedule.module';
+import { CorsMiddleware } from './common/middleware/cors.middleware';
 
 @Module({
   imports: [
@@ -38,7 +44,7 @@ import { ScheduleModule } from './common/schedule/schedule.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_SCHEMA,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Don't use this in production
+      synchronize: false, // Don't use this in production
       logging: true,
       charset: 'utf8mb4_unicode_ci', // 한글 인코딩
       timezone: '+09:00', // 한국 시간
@@ -71,4 +77,8 @@ import { ScheduleModule } from './common/schedule/schedule.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorsMiddleware).forRoutes('*');
+  }
+}
