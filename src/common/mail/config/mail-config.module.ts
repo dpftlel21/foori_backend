@@ -16,7 +16,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
             pass: process.env.MAIL_PASSWORD,
           },
           tls: {
-            rejectUnauthorized: false,
+            rejectUnauthorized: process.env.MAIL_TLS,
           },
         },
         defaults: {
