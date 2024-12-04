@@ -362,7 +362,7 @@ export class CrawlService {
     // 요일 범위 처리 (예: "화~토")
     if (dayString.includes('~')) {
       const [startDay, endDay] = dayString.split('~').map((d) => d.trim());
-      return this.getDaysInRange(startDay, endDay);
+      return this.getDaysInRange(startDay, endDay, weekDays);
     }
 
     // 개별 요일 목록 처리 (예: "월,수,목")
@@ -370,8 +370,11 @@ export class CrawlService {
   }
 
   // 요일 범위를 배열로 반환하는 함수 (예: 화~토 -> [화, 수, 목, 금, 토])
-  private getDaysInRange(startDay: string, endDay: string): string[] {
-    const weekDays = ['월', '화', '수', '목', '금', '토', '일'];
+  private getDaysInRange(
+    startDay: string,
+    endDay: string,
+    weekDays: string[],
+  ): string[] {
     const startIndex = weekDays.indexOf(startDay);
     const endIndex = weekDays.indexOf(endDay);
 

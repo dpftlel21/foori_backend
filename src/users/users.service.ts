@@ -116,6 +116,20 @@ export class UsersService {
   }
 
   /**
+   * 메인페이지 회원 정보 조회 함수
+   * @param userEmail
+   */
+  async getUserProfile(userEmail: string) {
+    const findUser = await this.findUserByEmail(userEmail);
+
+    return {
+      id: findUser.id,
+      name: findUser.name,
+      profileImageUri: findUser.profileImageUri,
+    };
+  }
+
+  /**
    * 회원 정보 수정 함수
    * @param userEmail
    * @param user

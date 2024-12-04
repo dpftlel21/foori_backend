@@ -44,7 +44,7 @@ import { CorsMiddleware } from './common/middleware/cors.middleware';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_SCHEMA,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false, // Don't use this in production
+      synchronize: true, // Don't use this in production
       logging: true,
       charset: 'utf8mb4_unicode_ci', // 한글 인코딩
       timezone: '+09:00', // 한국 시간

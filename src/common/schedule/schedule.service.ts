@@ -18,7 +18,7 @@ export class ScheduleService {
   async checkDormantAccounts() {
     const now = new Date();
     const allUserLogs =
-      await this.userLogsService.findAllUserLogsForDormantCheck(); // Service의 메서드 호출
+      await this.userLogsService.findAllUserLogsForDormantCheck();
 
     for (const log of allUserLogs) {
       if (log.nextDormantCheckDate <= now) {
@@ -35,11 +35,11 @@ export class ScheduleService {
   async notifyPasswordChange() {
     const now = new Date();
     const allUserLogs =
-      await this.userLogsService.findAllUserLogsForPasswordChangeNotification(); // Service의 메서드 호출
+      await this.userLogsService.findAllUserLogsForPasswordChangeNotification();
 
     for (const log of allUserLogs) {
       if (log.nextNotificationDate <= now) {
-        // 비밀번호 변경 알림 메일 발송
+        // 비밀번호 변경 알림
         await this.userService.sendPasswordChangeNotification(log.userId);
       }
     }

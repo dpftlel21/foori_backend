@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   forwardRef,
   Inject,
   Injectable,
@@ -89,9 +90,14 @@ export class UserLogsService {
   async findUserLogsByUserEmail(userEmail: string) {
     try {
       const findUser = await this.userService.findUserByEmail(userEmail);
-      return await this.userLogsRepository.findOneOrFail({
+      const findUserLog = await this.userLogsRepository.findOneOrFail({
         where: { userId: findUser.id },
       });
+      if (findUserLog.nextDormantCheckDate <= new Date()) {
+        throw new BadRequestException(
+          '휴면 계정으로 전환되었습니다. 메일 인증 후 서비스 이용이 가능합니다.',
+        );
+      }
     } catch (error) {
       throw new NotFoundException('일치하는 사용자 로그 정보가 없습니다.');
     }

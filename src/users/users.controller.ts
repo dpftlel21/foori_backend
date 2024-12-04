@@ -7,7 +7,6 @@ import {
   Query,
   UploadedFile,
   UseGuards,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -19,7 +18,6 @@ import { UpdateUserRequestDto } from './dto/update-user-request.dto';
 import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../common/decorator/user/user.decorator';
 import { UpdateUserPasswordRequestDto } from './dto/update-user-password-request.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadFileInterceptor } from '../common/decorator/upload/upload-file-interceptor.decorator';
 
 @Controller('users')
@@ -33,6 +31,16 @@ export class UsersController {
   @Post()
   async createUser(@Body() user: RegisterUserRequestDto) {
     return this.usersService.createUser(user);
+  }
+
+  /**
+   * 회원 프로필 및 회원명 조회
+   * @param userEmail
+   */
+  @Get('user-profile')
+  @UseGuards(AccessTokenGuard)
+  async getUserProfile(@User('email') userEmail: string) {
+    return this.usersService.getUserProfile(userEmail);
   }
 
   /**
