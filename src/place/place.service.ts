@@ -34,6 +34,20 @@ export class PlaceService {
     }
   }
 
+  async findAllRestaurants(): Promise<RestaurantInfoResponseDto[]> {
+    try {
+      const findAll = await this.restaurantRepository.find();
+
+      return findAll.map((restaurant) =>
+        plainToInstance(RestaurantInfoResponseDto, restaurant, {
+          excludeExtraneousValues: true,
+        }),
+      );
+    } catch (error) {
+      throw new NotFoundException('식당 정보가 없습니다.');
+    }
+  }
+
   async findMyPlaceByUserEmail(userEmail: string) {
     const findUser = await this.userService.findUserByEmail(userEmail);
 

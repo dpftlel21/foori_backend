@@ -18,6 +18,11 @@ export class PlaceController {
     private readonly reviewService: ReviewsService,
   ) {}
 
+  @Get()
+  async getAllRestaurants(): Promise<RestaurantInfoResponseDto[]> {
+    return this.placeService.findAllRestaurants();
+  }
+
   @Get(':restaurantId')
   async getRestaurant(
     @Param('restaurantId', ParseIntPipe) id: number,
