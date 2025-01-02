@@ -15,7 +15,7 @@ export class BookingEntity extends BaseModel {
 
   @Column({
     name: 'booking_time',
-    type: 'timestamp',
+    type: 'time',
     comment: '예약 시간',
   })
   bookingTime: Date;

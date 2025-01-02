@@ -4,12 +4,9 @@ import { IsDate, IsNumber, ValidateNested } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 
 export class CreateBookingRequestDto {
-  @Transform(({ value }) => new Date(`${value}T00:00:00`))
+  @Transform(({ value }) => new Date(value))
   @IsDate()
-  bookingDate: Date;
-  @Transform(({ obj }) => new Date(`${obj.bookingDate}T${obj.bookingTime}`))
-  @IsDate()
-  bookingTime: Date;
+  bookingDateTime: Date;
   @IsNumber()
   numOfPeople: number;
   @ValidateNested() // 객체 타입을 기대

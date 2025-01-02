@@ -35,11 +35,15 @@ export class BookingService {
 
     await this.verifyPossibleBooking(createRequestDto);
 
+    const bookingDate = new Date(
+      createRequestDto.bookingDateTime.getFullYear(),
+      createRequestDto.bookingDateTime.getMonth(),
+      createRequestDto.bookingDateTime.getDate(),
+    );
+
     const createdBooking = this.bookingRepository.create({
-      bookingDate: new Date(createRequestDto.bookingDate),
-      bookingTime: new Date(
-        `${createRequestDto.bookingDate} ${createRequestDto.bookingTime}`,
-      ),
+      bookingDate: bookingDate,
+      bookingTime: createRequestDto.bookingDateTime,
       numOfPeople: createRequestDto.numOfPeople,
       totalPrice: 0, // 초기값, 이후 메뉴 가격에 따라 업데이트
       paymentStatus: 1, // 결제 대기 상태
@@ -108,7 +112,7 @@ export class BookingService {
   ) {
     const threeHoursLater = new Date(new Date().getTime() + 3 * 60 * 60 * 1000);
 
-    if (createRequestDto.bookingTime < threeHoursLater) {
+    if (createRequestDto.bookingDateTime < threeHoursLater) {
       throw new BadRequestException(
         '현재 시간보다 3시간 이후의 예약만 가능합니다.',
       );
