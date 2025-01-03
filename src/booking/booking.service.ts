@@ -1,11 +1,12 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BookingEntity } from './entities/booking.entity';
-import { Repository } from 'typeorm';
+import { EntityNotFoundError, Repository } from 'typeorm';
 import { CreateBookingRequestDto } from './dto/create-booking-request.dto';
 import { PlaceService } from '../place/place.service';
 import { UsersService } from '../users/users.service';
@@ -223,6 +224,50 @@ export class BookingService {
       throw new NotFoundException(
         '일치하는 예약 정보가 없습니다.',
         error.message,
+      );
+    }
+  }
+
+  async cancelBooking(userEmail: string, bookingId: number) {
+    try {
+      const findUser = await this.userService.findUserByEmail(userEmail);
+      const findBooking = await this.bookingRepository.findOneOrFail({
+        where: {
+          id: bookingId,
+          user: { id: findUser.id },
+        },
+      });
+      if (findBooking.status === 9) {
+        throw new BadRequestException('이미 취소된 예약입니다.');
+      } else {
+        await this.isBookingCancellable(findBooking);
+        Object.assign(findBooking, { status: 9 });
+        await this.bookingRepository.save(findBooking);
+      }
+    } catch (error) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('일치하는 예약 정보가 없습니다.');
+      } else if (error instanceof BadRequestException) {
+        throw error;
+      } else {
+        throw new InternalServerErrorException(
+          '예약 취소 중 오류가 발생했습니다.',
+        );
+      }
+    }
+  }
+
+  async isBookingCancellable(booking: BookingEntity): Promise<void> {
+    const bookingDateTime = new Date(
+      `${booking.bookingDate.toISOString().split('T')[0]}T${booking.bookingTime}`,
+    );
+
+    const currentTime = new Date();
+    const oneHourLater = new Date(currentTime.getTime() + 60 * 60 * 1000);
+
+    if (bookingDateTime <= oneHourLater) {
+      throw new BadRequestException(
+        '예약 시간 1시간 이내로 남은 예약건은 취소가 불가능합니다.',
       );
     }
   }

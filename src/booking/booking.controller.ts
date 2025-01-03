@@ -19,4 +19,13 @@ export class BookingController {
       createBookingRequestDto,
     );
   }
+
+  @Post('cancel')
+  @UseGuards(AccessTokenGuard)
+  async cancelBooking(
+    @User('email') userEmail: string,
+    @Body('bookingId') bookingId: number,
+  ) {
+    return this.bookingService.cancelBooking(userEmail, bookingId);
+  }
 }
