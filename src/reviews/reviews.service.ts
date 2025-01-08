@@ -7,6 +7,7 @@ import { UsersService } from 'src/users/users.service';
 import { PlaceService } from '../place/place.service';
 import { BookingService } from '../booking/booking.service';
 import { BookingEntity } from '../booking/entities/booking.entity';
+import { ImagesService } from '../common/images/images.service';
 
 @Injectable()
 export class ReviewsService {
@@ -16,6 +17,7 @@ export class ReviewsService {
     private readonly usersService: UsersService,
     private readonly placeService: PlaceService,
     private readonly bookingService: BookingService,
+    private readonly imageService: ImagesService,
   ) {}
 
   /**
@@ -50,6 +52,13 @@ export class ReviewsService {
       });
 
       const savedReview = await this.reviewRepository.save(createdReview);
+
+      if (files) {
+        await this.imageService.uploadReviewImage(
+          savedReview.id.toString(),
+          files,
+        );
+      }
 
       await this.placeService.updateRestaurantReviewStats(findRestaurant.id);
       await this.bookingService.updateBookingReviewedStatus(findBooking.id);
