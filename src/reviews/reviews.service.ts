@@ -26,6 +26,7 @@ export class ReviewsService {
   async createReview(
     userEmail: string,
     createReviewRequestDto: CreateReviewRequestDto,
+    files?: Express.Multer.File[],
   ) {
     try {
       const verifyUser = await this.usersService.findUserByEmail(userEmail);

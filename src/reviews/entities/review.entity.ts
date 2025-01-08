@@ -3,6 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { RestaurantEntity } from '../../place/entities/restaurant.entity';
 import { LikeEntity } from '../../common/entities/like.entity';
+import { ReviewImageEntity } from '../../common/images/entities/review-image.entity';
 
 @Entity('reviews', { schema: 'foori' })
 export class ReviewEntity extends BaseModel {
@@ -51,4 +52,7 @@ export class ReviewEntity extends BaseModel {
 
   @OneToMany(() => LikeEntity, (like) => like.review)
   likes: LikeEntity[];
+
+  @OneToMany(() => ReviewImageEntity, (image) => image.review)
+  images: ReviewImageEntity[];
 }

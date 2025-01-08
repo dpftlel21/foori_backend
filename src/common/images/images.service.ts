@@ -19,4 +19,18 @@ export class ImagesService {
 
     return { userId, key, fileUrl };
   }
+
+  /**
+   * 리뷰 이미지 업로드 함수
+   * @param file
+   */
+  async uploadReviewImage(id: string, file: Express.Multer.File) {
+    const { userId, key, fileUrl } = await this.uploadService.uploadToS3(
+      id,
+      file,
+      ImageFolderEnum.REVIEW,
+    );
+
+    return { userId, key, fileUrl };
+  }
 }
