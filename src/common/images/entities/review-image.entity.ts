@@ -2,7 +2,7 @@ import { BaseModel } from 'src/common/entities/base-model';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ReviewEntity } from '../../../reviews/entities/review.entity';
 
-@Entity('reviews', { schema: 'foori' })
+@Entity('review_images', { schema: 'foori' })
 export class ReviewImageEntity extends BaseModel {
   @Column({
     name: 'review_image_url',
