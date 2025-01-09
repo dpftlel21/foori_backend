@@ -15,6 +15,7 @@ export class ReviewsService {
   constructor(
     @InjectRepository(ReviewEntity)
     private readonly reviewRepository: Repository<ReviewEntity>,
+    @InjectRepository(ReviewImageEntity)
     private readonly reviewImageRepository: Repository<ReviewImageEntity>,
     private readonly usersService: UsersService,
     private readonly placeService: PlaceService,
