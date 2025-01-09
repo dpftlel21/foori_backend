@@ -65,7 +65,7 @@ export class ReviewsService {
           return this.reviewImageRepository.create({
             imageUrl: imageInfo.fileUrl,
             imageKey: imageInfo.key,
-            review: savedReview, // savedReview 사용
+            review: savedReview,
           });
         });
         await this.reviewImageRepository.save(reviewImages);
