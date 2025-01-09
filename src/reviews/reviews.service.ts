@@ -8,12 +8,14 @@ import { PlaceService } from '../place/place.service';
 import { BookingService } from '../booking/booking.service';
 import { BookingEntity } from '../booking/entities/booking.entity';
 import { ImagesService } from '../common/images/images.service';
+import { ReviewImageEntity } from 'src/common/images/entities/review-image.entity';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectRepository(ReviewEntity)
     private readonly reviewRepository: Repository<ReviewEntity>,
+    private readonly reviewImageRepository: Repository<ReviewImageEntity>,
     private readonly usersService: UsersService,
     private readonly placeService: PlaceService,
     private readonly bookingService: BookingService,
@@ -53,11 +55,20 @@ export class ReviewsService {
 
       const savedReview = await this.reviewRepository.save(createdReview);
 
-      if (files) {
-        await this.imageService.uploadReviewImage(
+      if (files && files.length > 0) {
+        const uploadedImages = await this.imageService.uploadReviewImage(
           savedReview.id.toString(),
           files,
         );
+
+        const reviewImages = uploadedImages.map((imageInfo) => {
+          return this.reviewImageRepository.create({
+            imageUrl: imageInfo.fileUrl,
+            imageKey: imageInfo.key,
+            review: savedReview, // savedReview 사용
+          });
+        });
+        await this.reviewImageRepository.save(reviewImages);
       }
 
       await this.placeService.updateRestaurantReviewStats(findRestaurant.id);
@@ -128,7 +139,7 @@ export class ReviewsService {
   }
 
   /**
-   * 해당 식당의 리뷰 수 및 평균평점 조회 함수
+   * 해당 식당의 리뷰 정보 조회
    * @param restaurantId
    */
   async operReviewsByRestaurantId(restaurantId: number) {

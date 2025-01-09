@@ -7,10 +7,11 @@ import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { BookingModule } from '../booking/booking.module';
 import { PlaceModule } from '../place/place.module';
+import { ReviewImageEntity } from '../common/images/entities/review-image.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ReviewEntity]),
+    TypeOrmModule.forFeature([ReviewEntity, ReviewImageEntity]),
     UsersModule,
     AuthModule,
     forwardRef(() => PlaceModule),

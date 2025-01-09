@@ -30,7 +30,7 @@ export class PlaceController {
     return this.placeService.findRestaurantById(id);
   }
 
-  @Get(':restaurantId/reviews-count')
+  @Get(':restaurantId/reviews')
   async getRestaurantReviews(@Param('restaurantId', ParseIntPipe) id: number) {
     return this.reviewService.operReviewsByRestaurantId(id);
   }
