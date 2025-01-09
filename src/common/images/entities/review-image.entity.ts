@@ -5,13 +5,6 @@ import { ReviewEntity } from '../../../reviews/entities/review.entity';
 @Entity('reviews', { schema: 'foori' })
 export class ReviewImageEntity extends BaseModel {
   @Column({
-    name: 'review_id',
-    type: 'int',
-    comment: '리뷰 ID',
-  })
-  reviewId: number;
-
-  @Column({
     name: 'review_image_url',
     type: 'varchar',
     length: 500,
