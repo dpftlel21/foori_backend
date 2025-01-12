@@ -12,6 +12,11 @@ import { PlaceService } from '../place/place.service';
 import { UsersService } from '../users/users.service';
 import { MenusService } from '../menus/menus.service';
 import { BookingMenusService } from '../booking-menus/booking-menus.service';
+import { ConfirmPaymentRequestDto } from './dto/confirm-payment-reqeust.dto';
+import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class BookingService {
@@ -22,6 +27,8 @@ export class BookingService {
     private readonly placeService: PlaceService,
     private readonly menusService: MenusService,
     private readonly bookingMenuService: BookingMenusService,
+    private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
   ) {}
 
   async createBooking(
@@ -106,6 +113,77 @@ export class BookingService {
       .getOne();
 
     return bookingResponse;
+  }
+
+  async confirmPayment(
+    userEmail: string,
+    confirmPaymentDto: ConfirmPaymentRequestDto,
+  ) {
+    const findUser = await this.userService.findUserByEmail(userEmail);
+
+    const { paymentKey, orderId, amount } = confirmPaymentDto;
+    const getBookingId = orderId;
+
+    const findBooking = await this.findBookingById(
+      findUser.email,
+      getBookingId,
+    );
+
+    if (findBooking.totalPrice !== amount) {
+      throw new BadRequestException('결제 금액이 일치하지 않습니다.');
+    }
+
+    if (findBooking.paymentStatus !== 1) {
+      throw new BadRequestException('결제를 수행할 수 없습니다.');
+    }
+
+    const widgetSecretKey = this.configService.get<string>('TOSS_SECRET_KEY');
+    const encryptedSecretKey =
+      'Basic ' + Buffer.from(widgetSecretKey + ':').toString('base64');
+
+    try {
+      // 결제 승인 요청
+      const response = await firstValueFrom(
+        this.httpService.post(
+          'https://api.tosspayments.com/v1/payments/confirm',
+          {
+            orderId: orderId,
+            amount: amount,
+            paymentKey: paymentKey,
+          },
+          {
+            headers: {
+              Authorization: encryptedSecretKey,
+              'Content-Type': 'application/json',
+            },
+          },
+        ),
+      );
+
+      // 결제 상태 및 예약 상태 업데이트
+      Object.assign(findBooking, { paymentStatus: 2, status: 3 });
+      await this.bookingRepository.save(findBooking);
+
+      return response.data;
+    } catch (error) {
+      // await queryRunner.rollbackTransaction();
+
+      // 결제 실패 비즈니스 로직
+      if (error instanceof AxiosError) {
+        console.error(error.response.data);
+        throw new InternalServerErrorException(
+          '결제 승인에 실패했습니다.',
+          error.response.data,
+        );
+      } else {
+        console.error(error);
+        throw new InternalServerErrorException(
+          '결제 처리 중 오류가 발생했습니다.',
+        );
+      }
+    } finally {
+      // await queryRunner.release();
+    }
   }
 
   private async verifyPossibleBooking(
