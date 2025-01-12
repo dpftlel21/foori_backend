@@ -9,6 +9,7 @@ import { AuthModule } from '../auth/auth.module';
 import { UsersModule } from '../users/users.module';
 import { PlaceModule } from '../place/place.module';
 import { MenusModule } from '../menus/menus.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MenusModule } from '../menus/menus.module';
     UsersModule,
     forwardRef(() => PlaceModule),
     MenusModule,
+    HttpModule,
   ],
   controllers: [BookingController],
   providers: [BookingService, BookingMenusService],
