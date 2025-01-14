@@ -171,7 +171,6 @@ export class BookingService {
         paymentStatus: 2, // PaymentStatus.Completed
         status: 3, // BookingStatus.Confirmed
       });
-      await this.bookingRepository.save(findBooking);
 
       return response.data;
     } catch (error) {
