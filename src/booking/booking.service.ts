@@ -188,6 +188,7 @@ export class BookingService {
         );
       }
     } finally {
+      // 정상작동 확인후 트랜잭션 설정
       // await queryRunner.release();
     }
   }
