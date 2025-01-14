@@ -18,6 +18,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { CancelBookingPaymentRequestDto } from './dto/cancel-booking-payment-request.dto';
 
 @Injectable()
 export class BookingService {
@@ -207,6 +208,108 @@ export class BookingService {
     }
   }
 
+  async cancelPaymentBooking(
+    userEmail: string,
+    cancelPaymentDto: CancelBookingPaymentRequestDto,
+  ): Promise<void> {
+    const { orderId, cancelReason, paymentKey } = cancelPaymentDto; // paymentKey 추가
+
+    // 예약 정보 조회
+    const findBooking = await this.findBookingByOrderId(userEmail, orderId);
+
+    // 예약 정보가 없는 경우
+    if (!findBooking) {
+      throw new NotFoundException('해당 예약 정보를 찾을 수 없습니다.');
+    }
+
+    // 예약자와 요청자가 일치하는지 확인
+    if (findBooking.user.email !== userEmail) {
+      throw new BadRequestException('예약 취소 권한이 없습니다.');
+    }
+
+    // 예약 상태가 취소 가능한 상태인지 확인
+    if (findBooking.status !== 9 && findBooking.paymentStatus !== 9) {
+      throw new BadRequestException('취소할 수 없는 예약 상태입니다.');
+    }
+
+    await this.isBookingCancellationAllowed(findBooking);
+
+    // 토스페이먼츠 결제 취소 API 호출
+    const widgetSecretKey = this.configService.get<string>('TOSS_SECRET_KEY');
+    const encryptedSecretKey =
+      'Basic ' + Buffer.from(widgetSecretKey + ':').toString('base64');
+
+    // const queryRunner = this.dataSource.createQueryRunner();
+    // await queryRunner.connect();
+    // await queryRunner.startTransaction();
+
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post(
+          `https://api.tosspayments.com/v1/payments/${paymentKey}/cancel`, // paymentKey를 URL에 포함
+          {
+            cancelReason: cancelReason,
+          },
+          {
+            headers: {
+              Authorization: encryptedSecretKey,
+              'Content-Type': 'application/json',
+            },
+          },
+        ),
+      );
+
+      // 예약 상태 업데이트
+      await this.bookingRepository.update(findBooking.id, {
+        paymentStatus: 9, // PaymentStatus.Completed
+        status: 9, // BookingStatus.Confirmed
+      });
+
+      // TODO: 알림 보내기
+
+      // await queryRunner.commitTransaction();
+      return response.data;
+    } catch (error) {
+      // await queryRunner.rollbackTransaction();
+      if (error instanceof AxiosError) {
+        console.error(error.response.data);
+        throw new InternalServerErrorException(
+          '결제 취소에 실패했습니다.',
+          error.response.data,
+        );
+      } else {
+        console.error(error);
+        throw new InternalServerErrorException(
+          '결제 취소 중 오류가 발생했습니다.',
+        );
+      }
+    } finally {
+      // await queryRunner.release();
+    }
+  }
+
+  private async isBookingCancellationAllowed(
+    booking: BookingEntity,
+  ): Promise<void> {
+    const now = new Date();
+    const bookingDateTime = new Date(booking.bookingDate); // 예약 날짜
+    bookingDateTime.setHours(
+      booking.bookingTime.getHours(),
+      booking.bookingTime.getMinutes(),
+      0, // 초, 밀리초 0으로 설정
+      0,
+    );
+
+    const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // 1일을 밀리초로 변환
+    const oneDayBeforeBooking = new Date(
+      bookingDateTime.getTime() - oneDayInMilliseconds,
+    ); // 예약 하루 전
+
+    if (now > oneDayBeforeBooking) {
+      throw new BadRequestException('예약 하루 전까지만 취소가 가능합니다.');
+    }
+  }
+
   private async createOrderId(restaurantId: number) {
     const now = new Date();
     const timestamp = now.toISOString().replace(/[-:T.]/g, '');
@@ -375,47 +478,47 @@ export class BookingService {
     }
   }
 
-  async cancelBooking(userEmail: string, bookingId: number) {
-    try {
-      const findUser = await this.userService.findUserByEmail(userEmail);
-      const findBooking = await this.bookingRepository.findOneOrFail({
-        where: {
-          id: bookingId,
-          user: { id: findUser.id },
-        },
-      });
-      if (findBooking.status === 9) {
-        throw new BadRequestException('이미 취소된 예약입니다.');
-      } else {
-        await this.isBookingCancellable(findBooking);
-        Object.assign(findBooking, { status: 9 });
-        await this.bookingRepository.save(findBooking);
-      }
-    } catch (error) {
-      if (error instanceof EntityNotFoundError) {
-        throw new NotFoundException('일치하는 예약 정보가 없습니다.');
-      } else if (error instanceof BadRequestException) {
-        throw error;
-      } else {
-        throw new InternalServerErrorException(
-          '예약 취소 중 오류가 발생했습니다.',
-        );
-      }
-    }
-  }
-
-  async isBookingCancellable(booking: BookingEntity): Promise<void> {
-    const bookingDateTime = new Date(
-      `${booking.bookingDate.toISOString().split('T')[0]}T${booking.bookingTime}`,
-    );
-
-    const currentTime = new Date();
-    const oneHourLater = new Date(currentTime.getTime() + 60 * 60 * 1000);
-
-    if (bookingDateTime <= oneHourLater) {
-      throw new BadRequestException(
-        '예약 시간 1시간 이내로 남은 예약건은 취소가 불가능합니다.',
-      );
-    }
-  }
+  // async cancelBooking(userEmail: string, bookingId: number) {
+  //   try {
+  //     const findUser = await this.userService.findUserByEmail(userEmail);
+  //     const findBooking = await this.bookingRepository.findOneOrFail({
+  //       where: {
+  //         id: bookingId,
+  //         user: { id: findUser.id },
+  //       },
+  //     });
+  //     if (findBooking.status === 9) {
+  //       throw new BadRequestException('이미 취소된 예약입니다.');
+  //     } else {
+  //       await this.isBookingCancellable(findBooking);
+  //       Object.assign(findBooking, { status: 9 });
+  //       await this.bookingRepository.save(findBooking);
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof EntityNotFoundError) {
+  //       throw new NotFoundException('일치하는 예약 정보가 없습니다.');
+  //     } else if (error instanceof BadRequestException) {
+  //       throw error;
+  //     } else {
+  //       throw new InternalServerErrorException(
+  //         '예약 취소 중 오류가 발생했습니다.',
+  //       );
+  //     }
+  //   }
+  // }
+  //
+  // async isBookingCancellable(booking: BookingEntity): Promise<void> {
+  //   const bookingDateTime = new Date(
+  //     `${booking.bookingDate.toISOString().split('T')[0]}T${booking.bookingTime}`,
+  //   );
+  //
+  //   const currentTime = new Date();
+  //   const oneHourLater = new Date(currentTime.getTime() + 60 * 60 * 1000);
+  //
+  //   if (bookingDateTime <= oneHourLater) {
+  //     throw new BadRequestException(
+  //       '예약 시간 1시간 이내로 남은 예약건은 취소가 불가능합니다.',
+  //     );
+  //   }
+  // }
 }

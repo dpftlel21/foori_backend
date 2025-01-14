@@ -4,6 +4,7 @@ import { AccessTokenGuard } from '../auth/guard/bearer-token.guard';
 import { User } from '../common/decorator/user/user.decorator';
 import { CreateBookingRequestDto } from './dto/create-booking-request.dto';
 import { ConfirmPaymentRequestDto } from './dto/confirm-payment-reqeust.dto';
+import { CancelBookingPaymentRequestDto } from './dto/cancel-booking-payment-request.dto';
 
 @Controller('booking')
 export class BookingController {
@@ -38,8 +39,11 @@ export class BookingController {
   @UseGuards(AccessTokenGuard)
   async cancelBooking(
     @User('email') userEmail: string,
-    @Body('bookingId') bookingId: number,
+    @Body('cancelRequestDto') cancelRequestDto: CancelBookingPaymentRequestDto,
   ) {
-    return this.bookingService.cancelBooking(userEmail, bookingId);
+    return this.bookingService.cancelPaymentBooking(
+      userEmail,
+      cancelRequestDto,
+    );
   }
 }
