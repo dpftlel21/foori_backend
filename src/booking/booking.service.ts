@@ -167,7 +167,10 @@ export class BookingService {
       );
 
       // 결제 상태 및 예약 상태 업데이트
-      Object.assign(findBooking, { paymentStatus: 2, status: 3 });
+      await this.bookingRepository.update(findBooking.id, {
+        paymentStatus: 2, // PaymentStatus.Completed
+        status: 3, // BookingStatus.Confirmed
+      });
       await this.bookingRepository.save(findBooking);
 
       return response.data;
