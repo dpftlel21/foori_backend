@@ -59,6 +59,13 @@ export class BookingEntity extends BaseModel {
   })
   isReviewed: number; // 0 = false (리뷰 작성 안 함), 1 = true (리뷰 작성 완료)
 
+  @Column({
+    name: 'order_id',
+    type: 'string',
+    comment: '주문 ID',
+  })
+  orderId: string;
+
   @ManyToOne(() => UsersEntity, (user) => user.bookings, {
     onDelete: 'SET NULL',
   })

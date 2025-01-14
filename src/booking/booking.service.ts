@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class BookingService {
@@ -49,6 +50,10 @@ export class BookingService {
       createRequestDto.bookingDateTime.getDate(),
     );
 
+    const orderId = await this.createOrderId(
+      createRequestDto.restaurant.restaurantId,
+    );
+
     const createdBooking = this.bookingRepository.create({
       bookingDate: bookingDate,
       bookingTime: createRequestDto.bookingDateTime,
@@ -57,6 +62,7 @@ export class BookingService {
       paymentStatus: 1, // 결제 대기 상태
       status: 1, // 예약 대기 상태
       isReviewed: 0, // 리뷰 작성 안 함
+      orderId: orderId,
       user: findUser,
       restaurant: findRestaurant,
     });
@@ -99,6 +105,7 @@ export class BookingService {
         'booking.paymentStatus',
         'booking.status',
         'booking.isReviewed',
+        'booking.orderId',
         'user.name',
         'restaurant.name',
         'restaurant.address',
@@ -122,11 +129,10 @@ export class BookingService {
     const findUser = await this.userService.findUserByEmail(userEmail);
 
     const { paymentKey, orderId, amount } = confirmPaymentDto;
-    const getBookingId = orderId;
 
-    const findBooking = await this.findBookingById(
+    const findBooking = await this.findBookingByOrderId(
       findUser.email,
-      getBookingId,
+      orderId,
     );
 
     if (findBooking.totalPrice !== amount) {
@@ -198,6 +204,15 @@ export class BookingService {
     }
   }
 
+  private async createOrderId(restaurantId: number) {
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[-:T.]/g, '');
+    const uuid = uuidv4().replace(/-/g, '').substring(0, 12);
+
+    const orderId = `${timestamp}${uuid}${restaurantId}`; // 타임스탬프 + UUID + bookingId 조합
+    return orderId;
+  }
+
   async findBookingByUserEmail(userEmail: string) {
     try {
       const findUser = await this.userService.findUserByEmail(userEmail);
@@ -213,6 +228,7 @@ export class BookingService {
           'booking.paymentStatus',
           'booking.status',
           'booking.isReviewed',
+          'booking.orderId',
         ])
         // Restaurant에서 필요한 필드만 선택
         .leftJoin('booking.restaurant', 'restaurant')
@@ -258,6 +274,7 @@ export class BookingService {
             'booking.paymentStatus',
             'booking.status',
             'booking.isReviewed',
+            'booking.orderId',
           ])
           // Restaurant에서 필요한 필드만 선택
           .leftJoin('booking.restaurant', 'restaurant')
@@ -280,6 +297,55 @@ export class BookingService {
 
           .where('booking.user_id = :userId', { userId: findUser.id })
           .andWhere('booking.id = :bookingId', { bookingId })
+          .getOne()
+      );
+    } catch (error) {
+      throw new NotFoundException(
+        '일치하는 예약 정보가 없습니다.',
+        error.message,
+      );
+    }
+  }
+
+  async findBookingByOrderId(userEmail: string, orderId: string) {
+    try {
+      const findUser = await this.userService.findUserByEmail(userEmail);
+
+      return (
+        this.bookingRepository
+          .createQueryBuilder('booking')
+          .select([
+            'booking.id',
+            'booking.bookingDate',
+            'booking.bookingTime',
+            'booking.numOfPeople',
+            'booking.totalPrice',
+            'booking.paymentStatus',
+            'booking.status',
+            'booking.isReviewed',
+            'booking.orderId',
+          ])
+          // Restaurant에서 필요한 필드만 선택
+          .leftJoin('booking.restaurant', 'restaurant')
+          .addSelect([
+            'restaurant.id',
+            'restaurant.name',
+            'restaurant.address',
+            'restaurant.locationNum',
+            'restaurant.postalCode',
+            'restaurant.telNum',
+          ])
+
+          // BookingMenu 조인 및 menu_id, quantity 선택
+          .leftJoin('booking.bookingMenus', 'bookingMenu')
+          .addSelect(['bookingMenu.quantity'])
+
+          // Menus 테이블에서 menu_name, menu_price 선택
+          .leftJoin('bookingMenu.menu', 'menu')
+          .addSelect(['menu.name', 'menu.price'])
+
+          .where('booking.user_id = :userId', { userId: findUser.id })
+          .andWhere('booking.orderId = :orderId', { orderId })
           .getOne()
       );
     } catch (error) {
