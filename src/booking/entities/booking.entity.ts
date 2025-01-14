@@ -61,7 +61,7 @@ export class BookingEntity extends BaseModel {
 
   @Column({
     name: 'order_id',
-    type: 'string',
+    type: 'varchar',
     comment: '주문 ID',
   })
   orderId: string;
