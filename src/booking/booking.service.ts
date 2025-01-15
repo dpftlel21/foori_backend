@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BookingEntity } from './entities/booking.entity';
-import { EntityNotFoundError, Repository } from 'typeorm';
+import { EntityNotFoundError, Raw, Repository } from 'typeorm';
 import { CreateBookingRequestDto } from './dto/create-booking-request.dto';
 import { PlaceService } from '../place/place.service';
 import { UsersService } from '../users/users.service';
@@ -43,12 +43,24 @@ export class BookingService {
       createRequestDto.restaurant.restaurantId,
     );
 
-    await this.verifyPossibleBooking(createRequestDto);
-
     const bookingDate = new Date(
       createRequestDto.bookingDateTime.getFullYear(),
       createRequestDto.bookingDateTime.getMonth(),
       createRequestDto.bookingDateTime.getDate(),
+    );
+
+    const bookingTime = new Date();
+    bookingTime.setHours(
+      createRequestDto.bookingDateTime.getHours(),
+      createRequestDto.bookingDateTime.getMinutes(),
+      createRequestDto.bookingDateTime.getSeconds(),
+    );
+
+    await this.verifyPossibleBooking(
+      findUser.email,
+      bookingDate,
+      bookingTime,
+      createRequestDto,
     );
 
     const orderId = await this.createOrderId(
@@ -197,8 +209,25 @@ export class BookingService {
   }
 
   private async verifyPossibleBooking(
+    userEmail: string,
+    bookingDate: Date,
+    bookingTime: Date,
     createRequestDto: CreateBookingRequestDto,
   ) {
+    // 기존 예약이 있는지 확인
+    const existingBooking = await this.bookingRepository.findOne({
+      where: {
+        user: { email: userEmail },
+        restaurant: { id: createRequestDto.restaurant.restaurantId },
+        bookingDate: bookingDate,
+        bookingTime: bookingTime,
+      },
+    });
+
+    if (existingBooking) {
+      throw new BadRequestException('해당 시간에 예약한 내역이 있습니다.');
+    }
+
     const threeHoursLater = new Date(new Date().getTime() + 3 * 60 * 60 * 1000);
 
     if (createRequestDto.bookingDateTime < threeHoursLater) {
