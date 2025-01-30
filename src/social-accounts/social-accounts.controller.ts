@@ -36,34 +36,24 @@ export class SocialAccountsController {
   }
 
   @Get('connect/kakao/callback')
-  @UseGuards(AccessTokenGuard)
   async kakaoConnectCallback(
     @Query('code') code: string,
     @User('id') userId: number,
     @Res() res: Response,
   ) {
     console.log(`userId: ${userId}`);
-    const kakaoToken = await this.authKakaoService.getKakaoAccessToken(code); // 카카오 액세스 토큰 발급
+    const kakaoToken = await this.authKakaoService.getKakaoAccessToken(code);
     console.log(`kakaoToken: ${kakaoToken}`);
-    const userInfo = await this.authKakaoService.getKakaoUserInfo(kakaoToken); // 카카오 사용자 정보 가져오기
+    const userInfo = await this.authKakaoService.getKakaoUserInfo(kakaoToken);
     console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
 
     try {
-      // 카카오 계정 연동
-      const createdSocialAccount = await this.authKakaoService.linkKakaoAccount(
-        userId,
-        userInfo,
-      );
+      await this.authKakaoService.linkKakaoAccount(userId, userInfo);
       console.log('Successfully linked Kakao account');
-      return {
-        message: 'Successfully linked Kakao account',
-        redirectTo: '/mypage', // 리다이렉트할 URL
-      };
-
-      return createdSocialAccount;
+      return res.redirect(302, 'https://www-foori.com/mypage'); // 프론트엔드 마이페이지로 리디렉션
     } catch (error) {
       console.error('Error during Kakao account linking:', error);
-      return res.redirect('/mypage'); // 실패 시 다시 연결 페이지로 리다이렉트
+      return res.redirect(302, 'https://www-foori.com/mypage'); // 실패 시 다시 연결 페이지로 리디렉션
     }
   }
 
@@ -91,10 +81,9 @@ export class SocialAccountsController {
       });
 
       // 로그인 성공 후 프론트엔드 페이지로 리다이렉트
-      return res.redirect(302, 'https://www-foori.com/mypage');
+      return res.redirect(302, 'https://www-foori.com/main');
     } catch (error) {
       console.error('Error during Kakao login:', error);
-      return res.redirect(302, 'https://www-foori.com/mypage-fail');
     }
   }
 
