@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Query,
@@ -38,7 +39,7 @@ export class SocialAccountsController {
   @Get('connect/kakao/callback')
   async kakaoConnectCallback(
     @Query('code') code: string,
-    @User('id') userId: number,
+    @Body('id') userId: number,
     @Res() res: Response,
   ) {
     console.log(`userId: ${userId}`);
