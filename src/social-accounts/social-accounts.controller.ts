@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  ParseIntPipe,
   Query,
   Redirect,
   Res,
@@ -39,7 +40,7 @@ export class SocialAccountsController {
   @Get('connect/kakao/callback')
   async kakaoConnectCallback(
     @Query('code') code: string,
-    @Body('id') userId: number,
+    @Query('id', ParseIntPipe) userId: number,
     @Res() res: Response,
   ) {
     console.log(`userId: ${userId}`);
