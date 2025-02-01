@@ -39,7 +39,7 @@ export class SocialAccountsController {
   @Get('connect/kakao/callback')
   async kakaoConnectCallback(
     @Query('code') code: string,
-    @Body('id') userId: number,
+    @User('id') userId: number,
     @Res() res: Response,
   ) {
     console.log(`userId: ${userId}`);
