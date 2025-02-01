@@ -31,7 +31,7 @@ export class SocialAccountsController {
   }
 
   @Get('connect/kakao')
-  // @Redirect()
+  @Redirect()
   async kakaoLogin() {
     const kakaoAuthUrl = await this.getKakaoAuthUrl();
     return { url: kakaoAuthUrl };
