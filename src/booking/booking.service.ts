@@ -43,6 +43,11 @@ export class BookingService {
       createRequestDto.restaurant.restaurantId,
     );
 
+    console.log(
+      'Received bookingDateTime from frontend:',
+      createRequestDto.bookingDateTime,
+    );
+
     const bookingDate = new Date(
       createRequestDto.bookingDateTime.getFullYear(),
       createRequestDto.bookingDateTime.getMonth(),
