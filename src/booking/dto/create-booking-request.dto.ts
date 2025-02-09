@@ -1,11 +1,12 @@
 import { RestaurantInfoRequestDto } from '../../place/dto/restaurant-info-request.dto';
 import { CreateBookingMenusRequestDto } from '../../booking-menus/dto/create-booking-menus-request.dto';
 import { IsDate, IsNumber, ValidateNested } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 
 export class CreateBookingRequestDto {
-  @Transform(({ value }) => new Date(value))
+  // @Transform(({ value }) => new Date(value))
   @IsDate()
+  @Type(() => Date)
   bookingDateTime: Date;
   @IsNumber()
   numOfPeople: number;

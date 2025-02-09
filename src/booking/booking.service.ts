@@ -69,7 +69,7 @@ export class BookingService {
 
     const createdBooking = this.bookingRepository.create({
       bookingDate: bookingDate,
-      bookingTime: createRequestDto.bookingDateTime,
+      bookingTime: bookingTime,
       numOfPeople: createRequestDto.numOfPeople,
       totalPrice: 0, // 초기값, 이후 메뉴 가격에 따라 업데이트
       paymentStatus: 1, // 결제 대기 상태
