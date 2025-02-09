@@ -43,28 +43,13 @@ export class BookingService {
       createRequestDto.restaurant.restaurantId,
     );
 
-    console.log(
-      'Received bookingDateTime from frontend:',
-      createRequestDto.bookingDateTime,
-    );
-
-    const bookingDate = new Date(
-      createRequestDto.bookingDateTime.getFullYear(),
-      createRequestDto.bookingDateTime.getMonth(),
-      createRequestDto.bookingDateTime.getDate(),
-    );
-
-    const bookingTime = new Date();
-    bookingTime.setHours(
-      createRequestDto.bookingDateTime.getHours(),
-      createRequestDto.bookingDateTime.getMinutes(),
-      createRequestDto.bookingDateTime.getSeconds(),
-    );
+    const bookingDate = createRequestDto.bookingDateTime.slice(0, 10); // "YYYY-MM-DD"
+    const bookingTime = createRequestDto.bookingDateTime.slice(11, 19); // "HH:mm:ss"
 
     await this.verifyPossibleBooking(
       findUser.email,
-      bookingDate,
-      bookingTime,
+      bookingDate, // Date 객체 대신 문자열 전달
+      bookingTime, // Date 객체 대신 문자열 전달
       createRequestDto,
     );
 
@@ -215,27 +200,45 @@ export class BookingService {
 
   private async verifyPossibleBooking(
     userEmail: string,
-    bookingDate: Date,
-    bookingTime: Date,
+    bookingDate: string,
+    bookingTime: string,
     createRequestDto: CreateBookingRequestDto,
   ) {
-    // 기존 예약이 있는지 확인
-    const existingBooking = await this.bookingRepository.findOne({
-      where: {
-        user: { email: userEmail },
-        restaurant: { id: createRequestDto.restaurant.restaurantId },
-        bookingDate: bookingDate,
-        bookingTime: bookingTime,
-      },
-    });
+    const findUser = await this.userService.findUserByEmail(userEmail);
+
+    const findRestaurant = await this.placeService.findRestaurantById(
+      createRequestDto.restaurant.restaurantId,
+    );
+
+    const existingBooking = await this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoin('booking.user', 'user')
+      .leftJoin('booking.restaurant', 'restaurant')
+      .where('user.email = :userEmail', { userEmail: findUser.email })
+      .andWhere('restaurant.id = :restaurantId', {
+        restaurantId: findRestaurant.id,
+      })
+      .andWhere('booking.booking_date = :bookingDate', { bookingDate }) // 문자열 비교
+      .andWhere('booking.booking_time = :bookingTime', { bookingTime }) // 문자열 비교
+      .getOne();
 
     if (existingBooking) {
       throw new BadRequestException('해당 시간에 예약한 내역이 있습니다.');
     }
 
-    const threeHoursLater = new Date(new Date().getTime() + 3 * 60 * 60 * 1000);
+    // 3시간 이후 예약만 가능하도록 수정
+    // 받은 시간을 기준으로 계산.
+    const bookingDateTime = new Date(
+      bookingDate + 'T' + bookingTime + '+09:00',
+    ); //KST
+    const now = new Date();
 
-    if (createRequestDto.bookingDateTime < threeHoursLater) {
+    // Calculate the difference in milliseconds
+    const diff = bookingDateTime.getTime() - now.getTime();
+
+    // Convert milliseconds to hours
+    const diffHours = diff / (1000 * 60 * 60);
+    if (diffHours < 3) {
       throw new BadRequestException(
         '현재 시간보다 3시간 이후의 예약만 가능합니다.',
       );
