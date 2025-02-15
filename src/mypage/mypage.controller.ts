@@ -17,6 +17,16 @@ export class MypageController {
     private readonly userService: UsersService,
   ) {}
 
+  @Get('my-stats/:year/:month')
+  @UseGuards(AccessTokenGuard)
+  async getMyMonthlyStats(
+    @User('email') userEmail: string,
+    @Param('year') year: number,
+    @Param('month') month: number,
+  ) {
+    return this.bookingService.getMyMonthlyStats(userEmail, year, month);
+  }
+
   @Get('my-booking/:bookingId')
   @UseGuards(AccessTokenGuard)
   async getMyBooking(

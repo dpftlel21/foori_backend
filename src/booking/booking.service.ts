@@ -19,6 +19,7 @@ import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { CancelBookingPaymentRequestDto } from './dto/cancel-booking-payment-request.dto';
+import { RestaurantEntity } from '../place/entities/restaurant.entity';
 
 @Injectable()
 export class BookingService {
@@ -513,6 +514,80 @@ export class BookingService {
         error.message,
       );
     }
+  }
+
+  async getMyMonthlyStats(userEmail: string, year: number, month: number) {
+    const findUser = await this.userService.findUserByEmail(userEmail);
+    const userId = findUser.id;
+    const startDate = new Date(year, month - 1, 1); // 이번 달 시작일
+    const endDate = new Date(year, month, 0); // 이번 달 말일
+
+    const lastMonthStartDate = new Date(year, month - 2, 1); // 지난달 시작일
+    const lastMonthEndDate = new Date(year, month - 1, 0); // 지난달 말일
+
+    const result = await this.bookingRepository
+      .createQueryBuilder('b')
+      .select([
+        'r.category AS category',
+        'COUNT(b.id) AS categoryCount', // 카테고리별 예약 횟수 (이번 달)
+        '(SELECT SUM(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId) AS sumPrice', // 총 소비액
+        '(SELECT SUM(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId AND b2.bookingDateTime BETWEEN :lastMonthStartDate AND :lastMonthEndDate) AS beforeSumPrice', // 지난달 총 소비액
+        '(SELECT AVG(b2.totalPrice) FROM bookings b2 WHERE b2.user_id = :userId) AS myAvgPrice', // 평균 소비액
+        '(SELECT AVG(total_price) FROM bookings) AS totalUserAvgPrice', // 전체 평균
+      ])
+      .addSelect((subQuery) => {
+        // 가장 많이 방문한 카테고리
+        return subQuery
+          .select('r_inner.category')
+          .from(BookingEntity, 'b_inner')
+          .innerJoin(
+            RestaurantEntity,
+            'r_inner',
+            'b_inner.restaurant_id = r_inner.id',
+          )
+          .where('b_inner.user_id = :userId', { userId })
+          .andWhere('b_inner.bookingDateTime BETWEEN :startDate AND :endDate', {
+            startDate,
+            endDate,
+          })
+          .groupBy('r_inner.category')
+          .orderBy('COUNT(*)', 'DESC')
+          .limit(1);
+      }, 'MyMaxVisit')
+      .addSelect((subQuery) => {
+        // 가장 많이 방문한 카테고리 횟수
+        return subQuery
+          .select('count(r_inner.category)')
+          .from(BookingEntity, 'b_inner')
+          .innerJoin(
+            RestaurantEntity,
+            'r_inner',
+            'b_inner.restaurant_id = r_inner.id',
+          )
+          .where('b_inner.user_id = :userId', { userId })
+          .andWhere('b_inner.bookingDateTime BETWEEN :startDate AND :endDate', {
+            startDate,
+            endDate,
+          })
+          .groupBy('r_inner.category')
+          .orderBy('COUNT(*)', 'DESC')
+          .limit(1);
+      }, 'MyMaxVisitCount')
+      .innerJoin('b.restaurant', 'r') // INNER JOIN
+      .where('b.user_id = :userId', { userId }) // 사용자 ID 조건
+      .andWhere('b.bookingDateTime BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      }) // 이번 달 조건
+      .groupBy('r.category') // 카테고리별 그룹화
+      .orderBy('categoryCount', 'DESC') // 예약 횟수 내림차순 정렬
+      .setParameter('lastMonthStartDate', lastMonthStartDate) // 파라미터 바인딩
+      .setParameter('lastMonthEndDate', lastMonthEndDate) // 파라미터 바인딩
+      .setParameter('startDate', startDate)
+      .setParameter('endDate', endDate)
+      .getRawMany();
+
+    return result;
   }
 
   // async cancelBooking(userEmail: string, bookingId: number) {
