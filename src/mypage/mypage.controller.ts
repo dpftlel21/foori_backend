@@ -21,10 +21,10 @@ export class MypageController {
   @UseGuards(AccessTokenGuard)
   async getMyMonthlyStats(
     @User('email') userEmail: string,
-    @Param('year') year: number,
-    @Param('month') month: number,
+    @Param('from') from: Date,
+    @Param('to') to: Date,
   ) {
-    return this.bookingService.getMyMonthlyStats(userEmail, year, month);
+    return this.bookingService.getMyMonthlyStats(userEmail, from, to);
   }
 
   @Get('my-booking/:bookingId')
