@@ -541,7 +541,7 @@ export class BookingService {
         'COUNT(b.id) AS categoryCount', // 카테고리별 예약 횟수 (이번 달)
         '(SELECT SUM(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId) AS sumPrice', // 총 소비액
         '(SELECT SUM(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId AND b2.booking_date BETWEEN :lastMonthStartDate AND :lastMonthEndDate) AS beforeSumPrice', // 지난달 총 소비액
-        '(SELECT AVG(b2.totalPrice) FROM bookings b2 WHERE b2.user_id = :userId) AS myAvgPrice', // 평균 소비액
+        '(SELECT AVG(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId) AS myAvgPrice', // 평균 소비액
         '(SELECT AVG(total_price) FROM bookings) AS totalUserAvgPrice', // 전체 평균
       ])
       .addSelect((subQuery) => {
@@ -575,8 +575,8 @@ export class BookingService {
           )
           .where('b_inner.user_id = :userId', { userId })
           .andWhere('b_inner.booking_date BETWEEN :startDate AND :endDate', {
-            from,
-            to,
+            startDate,
+            endDate,
           })
           .groupBy('r_inner.category')
           .orderBy('COUNT(*)', 'DESC')
@@ -585,8 +585,8 @@ export class BookingService {
       .innerJoin('b.restaurant', 'r') // INNER JOIN
       .where('b.user_id = :userId', { userId }) // 사용자 ID 조건
       .andWhere('b.booking_date BETWEEN :startDate AND :endDate', {
-        from,
-        to,
+        startDate,
+        endDate,
       }) // 이번 달 조건
       .groupBy('r.category') // 카테고리별 그룹화
       .orderBy('categoryCount', 'DESC') // 예약 횟수 내림차순 정렬
