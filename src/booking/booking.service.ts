@@ -540,7 +540,7 @@ export class BookingService {
         'r.category AS category',
         'COUNT(b.id) AS categoryCount', // 카테고리별 예약 횟수 (이번 달)
         '(SELECT SUM(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId) AS sumPrice', // 총 소비액
-        '(SELECT SUM(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId AND b2.bookingDateTime BETWEEN :lastMonthStartDate AND :lastMonthEndDate) AS beforeSumPrice', // 지난달 총 소비액
+        '(SELECT SUM(b2.total_price) FROM bookings b2 WHERE b2.user_id = :userId AND b2.bookingDate BETWEEN :lastMonthStartDate AND :lastMonthEndDate) AS beforeSumPrice', // 지난달 총 소비액
         '(SELECT AVG(b2.totalPrice) FROM bookings b2 WHERE b2.user_id = :userId) AS myAvgPrice', // 평균 소비액
         '(SELECT AVG(total_price) FROM bookings) AS totalUserAvgPrice', // 전체 평균
       ])
@@ -555,7 +555,7 @@ export class BookingService {
             'b_inner.restaurant_id = r_inner.id',
           )
           .where('b_inner.user_id = :userId', { userId })
-          .andWhere('b_inner.bookingDateTime BETWEEN :startDate AND :endDate', {
+          .andWhere('b_inner.bookingDate BETWEEN :startDate AND :endDate', {
             startDate,
             endDate,
           })
@@ -574,7 +574,7 @@ export class BookingService {
             'b_inner.restaurant_id = r_inner.id',
           )
           .where('b_inner.user_id = :userId', { userId })
-          .andWhere('b_inner.bookingDateTime BETWEEN :startDate AND :endDate', {
+          .andWhere('b_inner.bookingDate BETWEEN :startDate AND :endDate', {
             from,
             to,
           })
@@ -584,7 +584,7 @@ export class BookingService {
       }, 'MyMaxVisitCount')
       .innerJoin('b.restaurant', 'r') // INNER JOIN
       .where('b.user_id = :userId', { userId }) // 사용자 ID 조건
-      .andWhere('b.bookingDateTime BETWEEN :startDate AND :endDate', {
+      .andWhere('b.bookingDate BETWEEN :startDate AND :endDate', {
         from,
         to,
       }) // 이번 달 조건
