@@ -1,10 +1,18 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  Unique,
+} from 'typeorm';
 import { BaseModel } from '../../common/entities/base-model';
 import { UsersEntity } from '../../users/entities/users.entity';
 import { RestaurantEntity } from '../../place/entities/restaurant.entity';
 import { BookingMenuEntity } from '../../booking-menus/entities/booking-menus.entity';
 
 @Entity('bookings', { schema: 'foori' })
+@Unique('unique_booking', ['user', 'restaurant', 'bookingDate', 'bookingTime'])
 export class BookingEntity extends BaseModel {
   @Column({
     name: 'booking_date',
