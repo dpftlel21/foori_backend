@@ -21,8 +21,8 @@ export class MypageController {
   @UseGuards(AccessTokenGuard)
   async getMyMonthlyStats(
     @User('email') userEmail: string,
-    @Param('from') from: Date,
-    @Param('to') to: Date,
+    @Param('fromDate') from: string,
+    @Param('toDate') to: string,
   ) {
     return this.bookingService.getMyMonthlyStats(userEmail, from, to);
   }

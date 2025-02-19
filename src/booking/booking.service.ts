@@ -516,16 +516,23 @@ export class BookingService {
     }
   }
 
-  async getMyMonthlyStats(userEmail: string, from: Date, to: Date) {
+  async getMyMonthlyStats(userEmail: string, from: string, to: string) {
     const findUser = await this.userService.findUserByEmail(userEmail);
     const userId = findUser.id;
 
+    const startDate = new Date(from);
+    const endDate = new Date(to);
+
     const lastMonthStartDate = new Date(
-      from.getFullYear(),
-      from.getMonth() - 2,
+      startDate.getFullYear(),
+      startDate.getMonth() - 1,
       1,
-    ); // 지난달 시작일
-    const lastMonthEndDate = new Date(to.getFullYear(), to.getMonth() - 1, 0); // 지난달 말일
+    );
+    const lastMonthEndDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      0,
+    );
 
     const result = await this.bookingRepository
       .createQueryBuilder('b')
@@ -549,8 +556,8 @@ export class BookingService {
           )
           .where('b_inner.user_id = :userId', { userId })
           .andWhere('b_inner.bookingDateTime BETWEEN :startDate AND :endDate', {
-            from,
-            to,
+            startDate,
+            endDate,
           })
           .groupBy('r_inner.category')
           .orderBy('COUNT(*)', 'DESC')
@@ -585,8 +592,8 @@ export class BookingService {
       .orderBy('categoryCount', 'DESC') // 예약 횟수 내림차순 정렬
       .setParameter('lastMonthStartDate', lastMonthStartDate) // 파라미터 바인딩
       .setParameter('lastMonthEndDate', lastMonthEndDate) // 파라미터 바인딩
-      .setParameter('startDate', from)
-      .setParameter('endDate', to)
+      .setParameter('startDate', startDate)
+      .setParameter('endDate', endDate)
       .getRawMany();
 
     return result;
