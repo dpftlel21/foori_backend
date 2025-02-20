@@ -6,7 +6,7 @@ export class CorsMiddleware implements NestMiddleware {
     const allowedOrigins = [
       'https://foori.co.kr',
       'https://www.foori.co.kr',
-      'https://www-foori.co.kr',
+      'https://www-foori.com',
       'http://localhost:5174',
       'https://52.79.150.195:3001',
     ];

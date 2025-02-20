@@ -1,6 +1,8 @@
 import {
+  Body,
   Controller,
   Get,
+  ParseIntPipe,
   Query,
   Redirect,
   Res,
@@ -40,40 +42,50 @@ export class SocialAccountsController {
   async kakaoConnectCallback(
     @Query('code') code: string,
     @User('id') userId: number,
-    // @Res() res: Response,
+    @Res() res: Response,
   ) {
     console.log(`userId: ${userId}`);
-    const kakaoToken = await this.authKakaoService.getKakaoAccessToken(code); // 카카오 액세스 토큰 발급
-    console.log(`kakaoToken: ${kakaoToken}`);
-    const userInfo = await this.authKakaoService.getKakaoUserInfo(kakaoToken); // 카카오 사용자 정보 가져오기
-    console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
-
-    try {
-      // 카카오 계정 연동
-      const createdSocialAccount = await this.authKakaoService.linkKakaoAccount(
-        userId,
-        userInfo,
-      );
-      console.log('Successfully linked Kakao account');
-      // return res.redirect('/profile'); // 성공 시 프로필 페이지로 리다이렉트
-      return createdSocialAccount;
-    } catch (error) {
-      console.error('Error during Kakao account linking:', error);
-      // return res.redirect('/profile'); // 실패 시 다시 연결 페이지로 리다이렉트
-    }
-  }
-
-  @Get('login/kakao/callback')
-  async kakaoCallback(@Query('code') code: string) {
     const kakaoToken = await this.authKakaoService.getKakaoAccessToken(code);
     console.log(`kakaoToken: ${kakaoToken}`);
     const userInfo = await this.authKakaoService.getKakaoUserInfo(kakaoToken);
     console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
 
     try {
-      return this.authKakaoService.loginWithKakao(userInfo);
+      await this.authKakaoService.linkKakaoAccount(userId, userInfo);
+      console.log('Successfully linked Kakao account');
+      return res.redirect(302, 'https://www-foori.com/mypage'); // 프론트엔드 마이페이지로 리디렉션
     } catch (error) {
-      // return res.redirect('/login');
+      console.error('Error during Kakao account linking:', error);
+      return res.redirect(302, 'https://www-foori.com/mypage'); // 실패 시 다시 연결 페이지로 리디렉션
+    }
+  }
+
+  @Get('login/kakao/callback')
+  async kakaoCallback(@Query('code') code: string, @Res() res: Response) {
+    const kakaoToken = await this.authKakaoService.getKakaoAccessToken(code);
+    console.log(`kakaoToken: ${kakaoToken}`);
+    const userInfo = await this.authKakaoService.getKakaoUserInfo(kakaoToken);
+    console.log(`userInfo: ${JSON.stringify(userInfo, null, 2)}`);
+
+    try {
+      const { accessToken, refreshToken } =
+        await this.authKakaoService.loginWithKakao(userInfo);
+
+      // 토큰을 쿠키에 저장 (보안 고려)
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: true, // HTTPS 사용 시
+        sameSite: 'strict',
+      });
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true, // HTTPS 사용 시
+        sameSite: 'strict',
+      });
+
+      // 로그인 성공 후 프론트엔드 페이지로 리다이렉트
+      return res.redirect(302, 'https://www-foori.com/main');
+    } catch (error) {
       console.error('Error during Kakao login:', error);
     }
   }
